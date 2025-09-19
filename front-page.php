@@ -70,8 +70,8 @@ html {
     <section class="front-page-section section-animate" id="hero-section">
         <?php 
         try {
-            get_template_part('template-parts/front-page/section', 'hero');
-            echo '<div style="color: green;">Hero section loaded successfully</div>';
+            // Try minimal hero section first
+            get_template_part('template-parts/front-page/section', 'hero-minimal');
         } catch (Exception $e) {
             echo '<div style="color: red;">Hero section error: ' . $e->getMessage() . '</div>';
         }
@@ -90,8 +90,7 @@ html {
     <section class="front-page-section section-animate" id="search-section">
         <?php 
         try {
-            get_template_part('template-parts/front-page/section', 'search');
-            echo '<div style="color: green;">Search section loaded successfully</div>';
+            get_template_part('template-parts/front-page/section', 'search-minimal');
         } catch (Exception $e) {
             echo '<div style="color: red;">Search section error: ' . $e->getMessage() . '</div>';
         }
@@ -110,8 +109,7 @@ html {
     <section class="front-page-section section-animate" id="categories-section">
         <?php 
         try {
-            get_template_part('template-parts/front-page/section', 'categories');
-            echo '<div style="color: green;">Categories section loaded successfully</div>';
+            get_template_part('template-parts/front-page/section', 'categories-minimal');
         } catch (Exception $e) {
             echo '<div style="color: red;">Categories section error: ' . $e->getMessage() . '</div>';
         }
