@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 // AI システムの初期化
 $ai_system = gi_init_ai_system();
 
-// 検索用のデータ取得
+// 検索用のデータ取得（安全なフォールバック付き）
 $categories = get_terms(array(
     'taxonomy' => 'grant_category',
     'hide_empty' => false,
@@ -30,6 +30,9 @@ $categories = get_terms(array(
     'order' => 'DESC',
     'number' => 100
 ));
+if (is_wp_error($categories) || empty($categories)) {
+    $categories = array(); // フォールバック
+}
 
 $prefectures = get_terms(array(
     'taxonomy' => 'grant_prefecture', 
@@ -37,6 +40,9 @@ $prefectures = get_terms(array(
     'orderby' => 'name',
     'order' => 'ASC'
 ));
+if (is_wp_error($prefectures) || empty($prefectures)) {
+    $prefectures = array(); // フォールバック
+}
 
 $industries = get_terms(array(
     'taxonomy' => 'grant_industry',
@@ -45,6 +51,9 @@ $industries = get_terms(array(
     'order' => 'DESC',
     'number' => 50
 ));
+if (is_wp_error($industries) || empty($industries)) {
+    $industries = array(); // フォールバック
+}
 
 // 統計情報
 $total_grants = wp_count_posts('grant');

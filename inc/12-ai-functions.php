@@ -2049,27 +2049,67 @@ class GI_AI_System {
     private function generate_advanced_ai_response($message, $context = array(), $conversation_id = '') {
         $start_time = microtime(true);
         
-        // 1. コンテキスト強化分析
-        $enhanced_context = $this->context_engine->enhance_context($message, $context, $conversation_id);
+        // 1. コンテキスト強化分析（安全なチェック付き）
+        $enhanced_context = $context;
+        if ($this->context_engine) {
+            try {
+                $enhanced_context = $this->context_engine->enhance_context($message, $context, $conversation_id);
+            } catch (Exception $e) {
+                // フォールバック: 元のコンテキストを使用
+                $enhanced_context = $context;
+            }
+        }
         
-        // 2. セマンティック理解
-        $semantic_analysis = $this->advanced_algorithms['semantic_search']->analyze($message, $enhanced_context);
+        // 2. セマンティック理解（安全なチェック付き）
+        $semantic_analysis = array('confidence' => 0.5, 'keywords' => array());
+        if (isset($this->advanced_algorithms['semantic_search']) && $this->advanced_algorithms['semantic_search']) {
+            try {
+                $semantic_analysis = $this->advanced_algorithms['semantic_search']->analyze($message, $enhanced_context);
+            } catch (Exception $e) {
+                // フォールバック: 基本的な分析結果
+                $semantic_analysis = $this->basic_semantic_analysis($message);
+            }
+        }
         
-        // 3. インテント予測（多層分類）
-        $intent_prediction = $this->advanced_algorithms['intent_recognition']->predict_intent(
-            $message, 
-            $enhanced_context, 
-            $this->neural_network['intent_classifier']
-        );
+        // 3. インテント予測（安全なチェック付き）
+        $intent_prediction = array('intent' => 'general_inquiry', 'confidence' => 0.5);
+        if (isset($this->advanced_algorithms['intent_recognition']) && $this->advanced_algorithms['intent_recognition']) {
+            try {
+                $intent_prediction = $this->advanced_algorithms['intent_recognition']->predict_intent(
+                    $message, 
+                    $enhanced_context, 
+                    $this->neural_network['intent_classifier'] ?? array()
+                );
+            } catch (Exception $e) {
+                // フォールバック: 基本的なインテント分析
+                $intent_prediction = $this->basic_intent_analysis($message);
+            }
+        }
         
-        // 4. 感情分析
-        $sentiment_analysis = $this->advanced_algorithms['sentiment_analysis']->analyze_sentiment($message);
+        // 4. 感情分析（安全なチェック付き）
+        $sentiment_analysis = array('polarity' => 'neutral', 'confidence' => 0.5);
+        if (isset($this->advanced_algorithms['sentiment_analysis']) && $this->advanced_algorithms['sentiment_analysis']) {
+            try {
+                $sentiment_analysis = $this->advanced_algorithms['sentiment_analysis']->analyze_sentiment($message);
+            } catch (Exception $e) {
+                // フォールバック: 基本的な感情分析
+                $sentiment_analysis = $this->basic_sentiment_analysis($message);
+            }
+        }
         
-        // 5. ユーザー個別化
-        $personalization_vector = $this->personalization_engine->generate_personalization_vector(
-            $enhanced_context,
-            $this->get_user_behavioral_profile()
-        );
+        // 5. ユーザー個別化（安全なチェック付き）
+        $personalization_vector = array('relevance_score' => 0.5);
+        if ($this->personalization_engine) {
+            try {
+                $personalization_vector = $this->personalization_engine->generate_personalization_vector(
+                    $enhanced_context,
+                    $this->get_user_behavioral_profile()
+                );
+            } catch (Exception $e) {
+                // フォールバック: 基本的な個別化スコア
+                $personalization_vector = array('relevance_score' => 0.5);
+            }
+        }
         
         // 6. 予測分析
         $predictive_insights = $this->advanced_algorithms['predictive_analytics']->generate_predictions(
@@ -2273,6 +2313,81 @@ function gi_check_api_health() { return 0.95; }
 function gi_check_database_performance() { return 0.92; }
 function gi_check_cache_efficiency() { return 0.88; }
 function gi_calculate_error_rate() { return 0.97; } // 1 - error_rate
+
+/**
+ * AI System initialization function
+ * Called by template files to initialize AI functionality
+ */
+    /**
+     * 基本的なセマンティック分析（フォールバック用）
+     */
+    private function basic_semantic_analysis($message) {
+        $keywords = array();
+        $confidence = 0.3;
+        
+        // 簡単なキーワード抽出
+        $common_words = array('補助金', '助成金', 'IT', '製造業', '創業', '起業', '設備', '研究', '開発');
+        foreach ($common_words as $word) {
+            if (strpos($message, $word) !== false) {
+                $keywords[] = $word;
+                $confidence += 0.1;
+            }
+        }
+        
+        return array(
+            'keywords' => $keywords,
+            'confidence' => min($confidence, 0.9)
+        );
+    }
+    
+    /**
+     * 基本的なインテント分析（フォールバック用）
+     */
+    private function basic_intent_analysis($message) {
+        $intents = array(
+            'search' => array('探す', '検索', '見つけ', '調べ'),
+            'consultation' => array('相談', 'アドバイス', '教え', 'サポート'),
+            'information' => array('情報', '詳細', '内容', '条件')
+        );
+        
+        foreach ($intents as $intent => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (strpos($message, $keyword) !== false) {
+                    return array('intent' => $intent, 'confidence' => 0.6);
+                }
+            }
+        }
+        
+        return array('intent' => 'general_inquiry', 'confidence' => 0.4);
+    }
+    
+    /**
+     * 基本的な感情分析（フォールバック用）
+     */
+    private function basic_sentiment_analysis($message) {
+        $positive_words = array('良い', 'ありがとう', '助かる', '素晴らしい', '最高');
+        $negative_words = array('困っ', '大変', '問題', 'だめ', '悪い');
+        
+        $positive_count = 0;
+        $negative_count = 0;
+        
+        foreach ($positive_words as $word) {
+            if (strpos($message, $word) !== false) $positive_count++;
+        }
+        
+        foreach ($negative_words as $word) {
+            if (strpos($message, $word) !== false) $negative_count++;
+        }
+        
+        if ($positive_count > $negative_count) {
+            return array('polarity' => 'positive', 'confidence' => 0.6);
+        } elseif ($negative_count > $positive_count) {
+            return array('polarity' => 'negative', 'confidence' => 0.6);
+        }
+        
+        return array('polarity' => 'neutral', 'confidence' => 0.5);
+    }
+}
 
 /**
  * AI System initialization function

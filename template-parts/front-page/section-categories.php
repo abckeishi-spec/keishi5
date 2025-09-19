@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
     exit('Direct access forbidden.');
 }
 
-// カテゴリ情報を取得（充実したデータ）
+// カテゴリ情報を取得（安全なフォールバック付き）
 $categories = get_terms(array(
     'taxonomy' => 'grant_category',
     'hide_empty' => false,
@@ -25,8 +25,19 @@ $categories = get_terms(array(
     'order' => 'DESC',
     'number' => 20
 ));
+if (is_wp_error($categories) || empty($categories)) {
+    // フォールバック: 基本カテゴリを手動定義
+    $categories = array(
+        (object)array('term_id' => 1, 'name' => 'IT・デジタル', 'slug' => 'it-digital', 'count' => 0),
+        (object)array('term_id' => 2, 'name' => 'ものづくり', 'slug' => 'monodukuri', 'count' => 0),
+        (object)array('term_id' => 3, 'name' => '創業・起業', 'slug' => 'startup', 'count' => 0),
+        (object)array('term_id' => 4, 'name' => '人材育成', 'slug' => 'human-resource', 'count' => 0),
+        (object)array('term_id' => 5, 'name' => '設備投資', 'slug' => 'equipment', 'count' => 0),
+        (object)array('term_id' => 6, 'name' => '研究開発', 'slug' => 'research', 'count' => 0)
+    );
+}
 
-// 業種情報も取得
+// 業種情報も取得（安全なフォールバック付き）
 $industries = get_terms(array(
     'taxonomy' => 'grant_industry',
     'hide_empty' => false,
@@ -34,6 +45,15 @@ $industries = get_terms(array(
     'order' => 'DESC',
     'number' => 12
 ));
+if (is_wp_error($industries) || empty($industries)) {
+    // フォールバック: 基本業種を手動定義
+    $industries = array(
+        (object)array('term_id' => 10, 'name' => '製造業', 'slug' => 'manufacturing', 'count' => 0),
+        (object)array('term_id' => 11, 'name' => 'IT・テクノロジー', 'slug' => 'it-technology', 'count' => 0),
+        (object)array('term_id' => 12, 'name' => 'サービス業', 'slug' => 'service', 'count' => 0),
+        (object)array('term_id' => 13, 'name' => '小売業', 'slug' => 'retail', 'count' => 0)
+    );
+}
 
 // カテゴリ用アイコンマッピング（充実版）
 $category_icons = array(

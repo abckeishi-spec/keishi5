@@ -1,17 +1,13 @@
 <?php
 /**
  * Grant Insight Perfect - Front Page Template
- * テンプレートパーツを活用したシンプル構成
+ * Production Version - Clean & Optimized
  * 
  * @package Grant_Insight_Perfect
- * @version 7.0-simple
+ * @version 8.0-production
  */
 
-get_header(); 
-
-// Debug: Check if we reach this point
-echo '<div style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999;">Front-page.php loaded!</div>';
-?>
+get_header(); ?>
 
 <style>
 /* フロントページ専用スタイル */
@@ -62,67 +58,29 @@ html {
      * メインビジュアルとキャッチコピー
      */
     ?>
-    <?php
-    // Debug: Test each section loading
-    echo '<div style="padding: 20px; background: #f0f0f0; margin: 10px 0; border: 2px solid #333;">';
-    echo '<h3>Loading Hero Section...</h3>';
-    ?>
     <section class="front-page-section section-animate" id="hero-section">
-        <?php 
-        try {
-            // Load original advanced hero section
-            get_template_part('template-parts/front-page/section', 'hero');
-            echo '<div style="color: green; padding: 5px; background: #e8f5e8;">✅ Advanced Hero Section Loaded</div>';
-        } catch (Exception $e) {
-            echo '<div style="color: red;">Hero section error: ' . $e->getMessage() . '</div>';
-            // Fallback to minimal version
-            get_template_part('template-parts/front-page/section', 'hero-minimal');
-        }
-        ?>
+        <?php get_template_part('template-parts/front-page/section', 'hero'); ?>
     </section>
-    <?php echo '</div>'; ?>
 
     <?php
     /**
      * 2. Search Section  
      * 助成金検索システム
      */
-    echo '<div style="padding: 20px; background: #e0e0e0; margin: 10px 0; border: 2px solid #333;">';
-    echo '<h3>Loading Search Section...</h3>';
     ?>
     <section class="front-page-section section-animate" id="search-section">
-        <?php 
-        try {
-            get_template_part('template-parts/front-page/section', 'search-minimal');
-        } catch (Exception $e) {
-            echo '<div style="color: red;">Search section error: ' . $e->getMessage() . '</div>';
-        }
-        ?>
+        <?php get_template_part('template-parts/front-page/section', 'search'); ?>
     </section>
-    <?php echo '</div>'; ?>
 
     <?php
     /**
      * 3. Categories Section
      * カテゴリ別ナビゲーション
      */
-    echo '<div style="padding: 20px; background: #d0d0d0; margin: 10px 0; border: 2px solid #333;">';
-    echo '<h3>Loading Categories Section...</h3>';
     ?>
     <section class="front-page-section section-animate" id="categories-section">
-        <?php 
-        try {
-            // Load original advanced categories section
-            get_template_part('template-parts/front-page/section', 'categories');
-            echo '<div style="color: green; padding: 5px; background: #e8f5e8;">✅ Advanced Categories Section Loaded</div>';
-        } catch (Exception $e) {
-            echo '<div style="color: red;">Categories section error: ' . $e->getMessage() . '</div>';
-            // Fallback to minimal version
-            get_template_part('template-parts/front-page/section', 'categories-minimal');
-        }
-        ?>
+        <?php get_template_part('template-parts/front-page/section', 'categories'); ?>
     </section>
-    <?php echo '</div>'; ?>
 
 </main>
 
@@ -348,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if ('performance' in window) {
         window.addEventListener('load', function() {
             const perfData = performance.getEntriesByType('navigation')[0];
-            if (perfData) {
+            if (perfData && window.giDebug) {
                 console.log('🚀 ページ読み込み時間:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
             }
         });
@@ -386,7 +344,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 250);
     });
     
-    console.log('✅ Grant Insight Perfect - フロントページ初期化完了');
+    if (window.giDebug) {
+        console.log('✅ Grant Insight Perfect - フロントページ初期化完了');
+    }
 });
 </script>
 
