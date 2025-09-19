@@ -1,10 +1,10 @@
 <?php
 /**
- * Grant Insight Perfect - Clean Header Template
- * シンプルで洗練されたヘッダー（助成金検索に特化）
+ * Simple & Elegant Header - Monochrome Design
+ * シンプルで洗練されたヘッダー（モノクロデザイン）
  * 
- * @package Grant_Insight_Perfect
- * @version 7.1.0-clean
+ * @package Grant_Insight_Clean
+ * @version 8.0.0-simple
  */
 ?>
 <!DOCTYPE html>
@@ -19,1278 +19,483 @@
     <!-- Preload fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         /* ===============================================
-           CLEAN HEADER COMPLETE STYLES
+           SIMPLE HEADER STYLES - MONOCHROME DESIGN
            =============================================== */
+        
+        :root {
+            --header-bg: #ffffff;
+            --header-text: #171717;
+            --header-text-muted: #737373;
+            --header-border: #e5e5e5;
+            --header-hover: #f5f5f5;
+            --header-accent: #000000;
+            --header-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --header-shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --header-transition: all 0.2s ease;
+        }
         
         * {
             box-sizing: border-box;
         }
         
         body {
-            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
             padding: 0;
             line-height: 1.6;
         }
         
-        .gi-container {
-            max-width: 1280px;
+        /* Header Container */
+        .simple-header {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--header-border);
+            transition: var(--header-transition);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        /* Desktop: Fixed header */
+        @media (min-width: 768px) {
+            .simple-header {
+                position: sticky;
+                top: 0;
+                box-shadow: var(--header-shadow);
+            }
+            
+            .simple-header.scrolled {
+                box-shadow: var(--header-shadow-lg);
+            }
+        }
+        
+        /* Mobile: Non-fixed header (scrolls away) */
+        @media (max-width: 767px) {
+            .simple-header {
+                position: static;
+            }
+        }
+        
+        .header-container {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
         }
         
-        @media (min-width: 1024px) {
-            .gi-container {
-                padding: 0 2rem;
-            }
-        }
-        
-        /* Header Base Styles */
-        .gi-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(229, 231, 235, 0.8);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(0);
-        }
-        
-        .gi-header.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-bottom-color: rgba(229, 231, 235, 1);
-        }
-        
-        .gi-header.hidden {
-            transform: translateY(-100%);
-        }
-        
-        /* Announcement Bar */
-        .gi-announcement {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 0.75rem 1rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .gi-announcement::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shimmer 3s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        .gi-announcement a {
-            color: white;
-            text-decoration: underline;
-            margin-left: 0.5rem;
-            font-weight: 600;
-        }
-        
-        .gi-announcement a:hover {
-            text-decoration: none;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
-        }
-        
-        /* Main Header Layout */
-        .gi-header-main {
+        .header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 4.5rem;
-            padding: 0;
+            height: 4rem;
         }
         
-        @media (min-width: 1024px) {
-            .gi-header-main {
-                height: 5.5rem;
+        @media (min-width: 768px) {
+            .header-content {
+                height: 5rem;
             }
         }
         
-        /* Logo Section */
-        .gi-logo {
+        /* Logo */
+        .header-logo {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             text-decoration: none;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-        
-        .gi-logo:hover {
-            transform: translateY(-2px);
-            filter: drop-shadow(0 8px 20px rgba(102, 126, 234, 0.3));
-        }
-        
-        .gi-logo-image {
-            height: 3rem;
-            width: auto;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        @media (min-width: 1024px) {
-            .gi-logo-image {
-                height: 3.5rem;
-            }
-        }
-        
-        .gi-logo-text h1 {
-            margin: 0;
-            font-size: 1.25rem;
+            color: var(--header-text);
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.2;
+            font-size: 1.25rem;
+            transition: var(--header-transition);
         }
         
-        @media (min-width: 1024px) {
-            .gi-logo-text h1 {
+        .header-logo:hover {
+            color: var(--header-accent);
+        }
+        
+        .header-logo-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--header-accent);
+            color: white;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .header-logo {
                 font-size: 1.5rem;
             }
-        }
-        
-        .gi-logo-text p {
-            margin: 0.25rem 0 0 0;
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-        
-        @media (min-width: 1024px) {
-            .gi-logo-text p {
-                font-size: 0.875rem;
+            
+            .header-logo-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 1.125rem;
             }
         }
         
-        @media (max-width: 640px) {
-            .gi-logo-text {
+        /* Hide logo text on small mobile */
+        @media (max-width: 480px) {
+            .header-logo-text {
                 display: none;
             }
         }
         
         /* Desktop Navigation */
-        .gi-nav {
+        .header-nav {
             display: none;
-            align-items: center;
-            gap: 2.5rem;
-            flex: 1;
-            justify-content: center;
-            margin: 0 2rem;
+            gap: 2rem;
         }
         
-        @media (min-width: 1024px) {
-            .gi-nav {
+        @media (min-width: 768px) {
+            .header-nav {
                 display: flex;
             }
         }
         
-        .gi-nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            color: #374151;
+        .nav-link {
+            color: var(--header-text-muted);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
-            border-radius: 0.75rem;
+            font-size: 0.9375rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: var(--header-transition);
             position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            white-space: nowrap;
         }
         
-        .gi-nav-link:hover {
-            color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        .nav-link:hover {
+            color: var(--header-text);
+            background: var(--header-hover);
         }
         
-        .gi-nav-link::before {
+        .nav-link.active {
+            color: var(--header-accent);
+            font-weight: 600;
+        }
+        
+        .nav-link.active::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: -0.125rem;
             left: 50%;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: all 0.3s ease;
             transform: translateX(-50%);
+            width: 1.5rem;
+            height: 2px;
+            background: var(--header-accent);
+            border-radius: 1px;
         }
         
-        .gi-nav-link:hover::before {
-            width: 80%;
-        }
-        
-        .gi-nav-link i {
-            font-size: 0.875rem;
-        }
-        
-        /* Current page indicator */
-        .gi-nav-link.current {
-            color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
-        }
-        
-        .gi-nav-link.current::before {
-            width: 80%;
-        }
-        
-        /* Desktop Actions */
-        .gi-actions {
-            display: none;
-            align-items: center;
-            gap: 1rem;
-            flex-shrink: 0;
-        }
-        
-        @media (min-width: 1024px) {
-            .gi-actions {
-                display: flex;
-            }
-        }
-        
-        .gi-btn {
+        /* Actions */
+        .header-actions {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            background: transparent;
-            white-space: nowrap;
         }
         
-        .gi-btn-icon {
-            width: 2.75rem;
-            height: 2.75rem;
-            padding: 0;
-            color: #6b7280;
+        .action-btn {
+            display: flex;
+            align-items: center;
             justify-content: center;
-            border-radius: 0.75rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--header-text-muted);
+            border-radius: 0.5rem;
+            transition: var(--header-transition);
+            cursor: pointer;
+            font-size: 1rem;
         }
         
-        .gi-btn-icon:hover {
-            color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        .action-btn:hover {
+            color: var(--header-text);
+            background: var(--header-hover);
         }
         
-        .gi-btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        @media (min-width: 768px) {
+            .action-btn {
+                width: 2.75rem;
+                height: 2.75rem;
+            }
         }
         
-        .gi-btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        /* Search Button - Desktop Only */
+        .search-btn {
+            display: none;
         }
         
-        .gi-btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-        
-        .gi-btn-success:hover {
-            background: linear-gradient(135deg, #0ea572 0%, #047857 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        @media (min-width: 768px) {
+            .search-btn {
+                display: flex;
+            }
         }
         
         /* Mobile Menu Button */
-        .gi-mobile-btn {
+        .mobile-menu-btn {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 2.75rem;
-            height: 2.75rem;
-            color: #6b7280;
-            background: transparent;
-            border: none;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
         
-        @media (min-width: 1024px) {
-            .gi-mobile-btn {
+        @media (min-width: 768px) {
+            .mobile-menu-btn {
                 display: none;
             }
         }
         
-        .gi-mobile-btn:hover {
-            color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            transform: scale(1.05);
-        }
-        
-        /* Search Bar */
-        .gi-search-bar {
-            border-top: 1px solid #e5e7eb;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            display: none;
-            transform: translateY(-10px);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-        
-        .gi-search-bar.show {
-            display: block;
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .gi-search-form {
-            padding: 1.5rem 0;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        @media (min-width: 768px) {
-            .gi-search-form {
-                flex-direction: row;
-                align-items: end;
-            }
-        }
-        
-        .gi-search-input-wrapper {
-            flex: 1;
-            position: relative;
-        }
-        
-        .gi-search-input {
-            width: 100%;
-            padding: 1rem 1.25rem 1rem 3rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 1rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
-            font-weight: 500;
-        }
-        
-        .gi-search-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .gi-search-input::placeholder {
-            color: #9ca3af;
-            font-weight: 400;
-        }
-        
-        .gi-search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 1.125rem;
-        }
-        
-        .gi-search-filters {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-        
-        .gi-search-select {
-            padding: 1rem 1.25rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 1rem;
-            background: white;
-            font-size: 0.875rem;
-            font-weight: 500;
-            min-width: 140px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .gi-search-select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .gi-search-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            white-space: nowrap;
-        }
-        
-        .gi-search-submit:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-        
-        /* Mobile Menu */
-        .gi-mobile-overlay {
+        /* Mobile Menu Overlay */
+        .mobile-menu {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 999;
+            z-index: 9999;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.4s ease;
+            transition: var(--header-transition);
         }
         
-        .gi-mobile-overlay.show {
+        .mobile-menu.active {
             opacity: 1;
             visibility: visible;
         }
         
-        .gi-mobile-menu {
-            position: fixed;
+        .mobile-menu-panel {
+            position: absolute;
             top: 0;
             right: 0;
+            width: 100%;
+            max-width: 20rem;
             height: 100%;
-            width: 22rem;
-            max-width: 85vw;
-            background: white;
+            background: var(--header-bg);
+            padding: 1.5rem;
             transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.3s ease;
             overflow-y: auto;
-            z-index: 1000;
-            box-shadow: -10px 0 25px rgba(0, 0, 0, 0.1);
         }
         
-        .gi-mobile-menu.show {
+        .mobile-menu.active .mobile-menu-panel {
             transform: translateX(0);
         }
         
-        .gi-mobile-header {
+        .mobile-menu-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--header-border);
         }
         
-        .gi-mobile-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .mobile-menu-title {
+            font-weight: 600;
+            color: var(--header-text);
         }
         
-        .gi-mobile-close {
-            width: 2.5rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            background: transparent;
+        .mobile-menu-close {
+            width: 2rem;
+            height: 2rem;
             border: none;
-            border-radius: 0.5rem;
+            background: transparent;
+            color: var(--header-text-muted);
+            border-radius: 0.25rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--header-transition);
         }
         
-        .gi-mobile-close:hover {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-            transform: scale(1.1);
+        .mobile-menu-close:hover {
+            color: var(--header-text);
+            background: var(--header-hover);
         }
         
-        .gi-mobile-search {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-            background: #fafafa;
+        .mobile-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
         
-        .gi-mobile-nav {
-            padding: 1rem 0;
-        }
-        
-        .gi-mobile-nav-link {
+        .mobile-nav-link {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.5rem;
-            color: #374151;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            color: var(--header-text);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
+            border-radius: 0.5rem;
+            transition: var(--header-transition);
         }
         
-        .gi-mobile-nav-link:hover {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            color: #667eea;
-            border-left-color: #667eea;
-            padding-left: 2rem;
+        .mobile-nav-link:hover {
+            background: var(--header-hover);
         }
         
-        .gi-mobile-nav-link i {
+        .mobile-nav-link.active {
+            background: var(--header-accent);
+            color: white;
+        }
+        
+        .mobile-nav-icon {
             width: 1.25rem;
             text-align: center;
-            font-size: 1rem;
         }
         
-        .gi-mobile-actions {
-            border-top: 1px solid #e5e7eb;
-            padding: 1.5rem;
-            background: #fafafa;
-        }
-        
-        .gi-mobile-cta {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 1rem;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-        
-        .gi-mobile-cta:hover {
-            background: linear-gradient(135deg, #0ea572 0%, #047857 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-        }
-        
-        /* Statistics Display */
-        .gi-stats {
-            display: none;
-            align-items: center;
-            gap: 2rem;
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-left: 2rem;
-        }
-        
-        @media (min-width: 1280px) {
-            .gi-stats {
-                display: flex;
-            }
-        }
-        
-        .gi-stat-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .gi-stat-number {
-            font-weight: 700;
-            color: #667eea;
-        }
-        
-        /* Utility Classes */
-        .gi-hidden {
-            display: none !important;
-        }
-        
-        .gi-flex {
-            display: flex;
-        }
-        
-        .gi-items-center {
-            align-items: center;
-        }
-        
-        .gi-justify-between {
-            justify-content: space-between;
-        }
-        
-        .gi-justify-center {
-            justify-content: center;
-        }
-        
-        .gi-space-x-2 > * + * {
-            margin-left: 0.5rem;
-        }
-        
-        .gi-space-x-3 > * + * {
-            margin-left: 0.75rem;
-        }
-        
-        .gi-w-full {
-            width: 100%;
-        }
-        
-        .gi-relative {
-            position: relative;
-        }
-        
-        /* Animation Classes */
-        @keyframes gi-fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .gi-animate-fade-up {
-            animation: gi-fadeInUp 0.4s ease-out;
-        }
-        
-        @keyframes gi-slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        
-        .gi-animate-slide-right {
-            animation: gi-slideInRight 0.3s ease-out;
-        }
-        
-        /* Loading State */
-        .gi-loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        
-        .gi-loading::after {
-            content: '';
+        /* Utilities */
+        .sr-only {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2px solid #667eea;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
     </style>
 </head>
-
 <body <?php body_class(); ?>>
-<?php wp_body_open(); ?>
 
-<!-- Header -->
-<header id="gi-site-header" class="gi-header">
-    <!-- Announcement Bar -->
-    <?php if (get_theme_mod('gi_show_announcement', true)): ?>
-    <div class="gi-announcement">
-        <div class="gi-container">
-            <i class="fas fa-bullhorn" style="margin-right: 0.5rem;"></i>
-            <?php echo esc_html(get_theme_mod('gi_announcement_text', '🎯 最新助成金情報を随時更新中！あなたにぴったりの支援制度を見つけよう')); ?>
-            <?php if ($announcement_link = get_theme_mod('gi_announcement_link', get_post_type_archive_link('grant'))): ?>
-                <a href="<?php echo esc_url($announcement_link); ?>">今すぐ検索する →</a>
-            <?php endif; ?>
-        </div>
-    </div>
-    <?php endif; ?>
-    
-    <!-- Main Header -->
-    <div class="gi-container">
-        <div class="gi-header-main">
+<!-- Simple Header -->
+<header class="simple-header" id="header">
+    <div class="header-container">
+        <div class="header-content">
             <!-- Logo -->
-            <a href="<?php echo esc_url(home_url('/')); ?>" class="gi-logo">
-                <img src="http://joseikin-insight.com/wp-content/uploads/2025/09/名称未設定のデザイン.png" 
-                     alt="<?php bloginfo('name'); ?>" 
-                     class="gi-logo-image"
-                     loading="eager">
-                
-                <div class="gi-logo-text">
-                    <h1><?php bloginfo('name'); ?></h1>
-                    <?php if ($tagline = get_bloginfo('description')): ?>
-                        <p><?php echo esc_html($tagline); ?></p>
-                    <?php endif; ?>
+            <a href="<?php echo home_url(); ?>" class="header-logo">
+                <div class="header-logo-icon">
+                    <i class="fas fa-coins"></i>
                 </div>
+                <span class="header-logo-text">Grant Insight</span>
             </a>
             
             <!-- Desktop Navigation -->
-            <nav class="gi-nav" role="navigation">
-                <?php
-                // Get current page info for active state
-                $current_url = home_url(add_query_arg(null, null));
-                $home_url = home_url('/');
-                $grants_url = get_post_type_archive_link('grant');
-                
-                $menu_items = array(
-                    array(
-                        'url' => $home_url, 
-                        'title' => 'ホーム', 
-                        'icon' => 'fas fa-home',
-                        'current' => ($current_url === $home_url)
-                    ),
-                    array(
-                        'url' => $grants_url, 
-                        'title' => '助成金一覧', 
-                        'icon' => 'fas fa-list-ul',
-                        'current' => (strpos($current_url, 'grants') !== false || is_post_type_archive('grant') || is_singular('grant'))
-                    ),
-                    array(
-                        'url' => home_url('/about/'), 
-                        'title' => 'サイトについて', 
-                        'icon' => 'fas fa-info-circle',
-                        'current' => (strpos($current_url, '/about/') !== false)
-                    ),
-                );
-                
-                foreach ($menu_items as $item) {
-                    $class = 'gi-nav-link';
-                    if ($item['current']) {
-                        $class .= ' current';
-                    }
-                    
-                    echo '<a href="' . esc_url($item['url']) . '" class="' . $class . '">';
-                    echo '<i class="' . esc_attr($item['icon']) . '"></i>';
-                    echo '<span>' . esc_html($item['title']) . '</span>';
-                    echo '</a>';
-                }
-                ?>
+            <nav class="header-nav" aria-label="メインナビゲーション">
+                <a href="<?php echo home_url('/grants/'); ?>" class="nav-link <?php echo (is_post_type_archive('grant') || is_singular('grant')) ? 'active' : ''; ?>">
+                    助成金検索
+                </a>
+                <a href="<?php echo home_url('/categories/'); ?>" class="nav-link <?php echo is_tax('grant_category') ? 'active' : ''; ?>">
+                    カテゴリ
+                </a>
+                <a href="<?php echo home_url('/blog/'); ?>" class="nav-link <?php echo is_home() || is_singular('post') ? 'active' : ''; ?>">
+                    コラム
+                </a>
+                <a href="<?php echo home_url('/about/'); ?>" class="nav-link <?php echo is_page('about') ? 'active' : ''; ?>">
+                    サービス
+                </a>
             </nav>
             
-            <!-- Desktop Actions -->
-            <div class="gi-actions">
-                <!-- Search Toggle -->
-                <button type="button" id="gi-search-toggle" class="gi-btn gi-btn-icon" title="詳細検索" aria-label="詳細検索を開く">
+            <!-- Actions -->
+            <div class="header-actions">
+                <button class="action-btn search-btn" aria-label="検索" onclick="openSearch()">
                     <i class="fas fa-search"></i>
                 </button>
-                
-                <!-- Stats Display -->
-                <div class="gi-stats">
-                    <?php
-                    $stats = gi_get_cached_stats();
-                    if ($stats && !empty($stats['total_grants'])) {
-                        echo '<div class="gi-stat-item">';
-                        echo '<i class="fas fa-database"></i>';
-                        echo '<span class="gi-stat-number">' . number_format($stats['total_grants']) . '</span>';
-                        echo '<span>件の助成金</span>';
-                        echo '</div>';
-                        
-                        if (!empty($stats['active_grants'])) {
-                            echo '<div class="gi-stat-item">';
-                            echo '<i class="fas fa-circle" style="color: #10b981;"></i>';
-                            echo '<span class="gi-stat-number">' . number_format($stats['active_grants']) . '</span>';
-                            echo '<span>募集中</span>';
-                            echo '</div>';
-                        }
-                    }
-                    ?>
-                </div>
-                
-                <!-- CTA Button -->
-                <a href="<?php echo esc_url(get_post_type_archive_link('grant')); ?>" class="gi-btn gi-btn-success">
-                    <i class="fas fa-search"></i>
-                    <span>助成金を探す</span>
-                </a>
+                <button class="action-btn mobile-menu-btn" aria-label="メニューを開く" onclick="openMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            
-            <!-- Mobile Menu Button -->
-            <button type="button" id="gi-mobile-menu-btn" class="gi-mobile-btn" aria-label="メニューを開く">
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-        </div>
-    </div>
-    
-    <!-- Advanced Search Bar -->
-    <div id="gi-search-bar" class="gi-search-bar">
-        <div class="gi-container">
-            <form id="gi-search-form" class="gi-search-form">
-                <div class="gi-search-input-wrapper">
-                    <input type="text" 
-                           id="gi-search-input"
-                           name="search" 
-                           placeholder="助成金名、実施組織名、対象事業者などで検索..." 
-                           class="gi-search-input"
-                           autocomplete="off">
-                    <i class="fas fa-search gi-search-icon"></i>
-                </div>
-                
-                <div class="gi-search-filters">
-                    <select name="category" class="gi-search-select" aria-label="カテゴリーを選択">
-                        <option value="">すべてのカテゴリー</option>
-                        <?php
-                        $categories = get_terms(array(
-                            'taxonomy' => 'grant_category',
-                            'hide_empty' => true,
-                            'orderby' => 'count',
-                            'order' => 'DESC',
-                            'number' => 30
-                        ));
-                        if ($categories && !is_wp_error($categories)) {
-                            foreach ($categories as $category) {
-                                echo '<option value="' . esc_attr($category->slug) . '">';
-                                echo esc_html($category->name) . ' (' . $category->count . ')';
-                                echo '</option>';
-                            }
-                        }
-                        ?>
-                    </select>
-                    
-                    <select name="prefecture" class="gi-search-select" aria-label="都道府県を選択">
-                        <option value="">全国対象</option>
-                        <?php
-                        $prefectures = get_terms(array(
-                            'taxonomy' => 'grant_prefecture',
-                            'hide_empty' => true,
-                            'orderby' => 'name',
-                            'order' => 'ASC'
-                        ));
-                        if ($prefectures && !is_wp_error($prefectures)) {
-                            foreach ($prefectures as $prefecture) {
-                                echo '<option value="' . esc_attr($prefecture->slug) . '">';
-                                echo esc_html($prefecture->name) . ' (' . $prefecture->count . ')';
-                                echo '</option>';
-                            }
-                        }
-                        ?>
-                    </select>
-                    
-                    <button type="submit" class="gi-search-submit">
-                        <i class="fas fa-search"></i>
-                        <span>検索実行</span>
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </header>
 
 <!-- Mobile Menu -->
-<div id="gi-mobile-overlay" class="gi-mobile-overlay">
-    <div id="gi-mobile-menu" class="gi-mobile-menu">
-        <!-- Mobile Header -->
-        <div class="gi-mobile-header">
-            <div class="gi-mobile-title">
-                <i class="fas fa-bars"></i>
-                メニュー
-            </div>
-            <button type="button" id="gi-mobile-close" class="gi-mobile-close" aria-label="メニューを閉じる">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+<div class="mobile-menu" id="mobileMenu" onclick="closeMobileMenu(event)">
+    <div class="mobile-menu-panel" onclick="event.stopPropagation()">
+        <div class="mobile-menu-header">
+            <span class="mobile-menu-title">メニュー</span>
+            <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="メニューを閉じる">
+                <i class="fas fa-times"></i>
             </button>
         </div>
         
-        <!-- Mobile Search -->
-        <div class="gi-mobile-search">
-            <div class="gi-search-input-wrapper">
-                <input type="text" 
-                       placeholder="助成金を検索..." 
-                       class="gi-search-input"
-                       id="gi-mobile-search-input">
-                <i class="fas fa-search gi-search-icon"></i>
-            </div>
-        </div>
-        
-        <!-- Mobile Navigation -->
-        <nav class="gi-mobile-nav">
-            <?php
-            foreach ($menu_items as $item) {
-                echo '<a href="' . esc_url($item['url']) . '" class="gi-mobile-nav-link">';
-                echo '<i class="' . esc_attr($item['icon']) . '"></i>';
-                echo '<span>' . esc_html($item['title']) . '</span>';
-                if ($item['current']) {
-                    echo '<i class="fas fa-circle" style="margin-left: auto; font-size: 0.5rem; color: #667eea;"></i>';
-                }
-                echo '</a>';
-            }
-            ?>
-        </nav>
-        
-        <!-- Mobile Actions -->
-        <div class="gi-mobile-actions">
-            <a href="<?php echo esc_url(get_post_type_archive_link('grant')); ?>" class="gi-mobile-cta">
-                <i class="fas fa-search"></i>
-                <span>助成金を探す</span>
+        <nav class="mobile-nav" aria-label="モバイルナビゲーション">
+            <a href="<?php echo home_url(); ?>" class="mobile-nav-link <?php echo is_front_page() ? 'active' : ''; ?>">
+                <i class="fas fa-home mobile-nav-icon"></i>
+                <span>ホーム</span>
             </a>
-            
-            <?php if ($stats && !empty($stats['total_grants'])): ?>
-            <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: 0.875rem; color: #6b7280;">
-                <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
-                現在 <strong style="color: #667eea;"><?php echo number_format($stats['total_grants']); ?>件</strong> の助成金情報を掲載中
-                <?php if (!empty($stats['active_grants'])): ?>
-                （<strong style="color: #10b981;"><?php echo number_format($stats['active_grants']); ?>件</strong> 募集中）
-                <?php endif; ?>
-            </div>
-            <?php endif; ?>
-        </div>
+            <a href="<?php echo home_url('/grants/'); ?>" class="mobile-nav-link <?php echo (is_post_type_archive('grant') || is_singular('grant')) ? 'active' : ''; ?>">
+                <i class="fas fa-coins mobile-nav-icon"></i>
+                <span>助成金検索</span>
+            </a>
+            <a href="<?php echo home_url('/categories/'); ?>" class="mobile-nav-link <?php echo is_tax('grant_category') ? 'active' : ''; ?>">
+                <i class="fas fa-th-large mobile-nav-icon"></i>
+                <span>カテゴリ</span>
+            </a>
+            <a href="<?php echo home_url('/blog/'); ?>" class="mobile-nav-link <?php echo is_home() || is_singular('post') ? 'active' : ''; ?>">
+                <i class="fas fa-newspaper mobile-nav-icon"></i>
+                <span>コラム</span>
+            </a>
+            <a href="<?php echo home_url('/about/'); ?>" class="mobile-nav-link <?php echo is_page('about') ? 'active' : ''; ?>">
+                <i class="fas fa-info-circle mobile-nav-icon"></i>
+                <span>サービス</span>
+            </a>
+        </nav>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // ===============================================
-    // CLEAN HEADER FUNCTIONALITY
-    // ===============================================
+// Header scroll behavior for desktop
+let lastScrollY = window.scrollY;
+let header = document.getElementById('header');
+
+function handleScroll() {
+    const currentScrollY = window.scrollY;
     
-    // Elements
-    const header = document.getElementById('gi-site-header');
-    const searchToggle = document.getElementById('gi-search-toggle');
-    const searchBar = document.getElementById('gi-search-bar');
-    const searchForm = document.getElementById('gi-search-form');
-    const searchInput = document.getElementById('gi-search-input');
-    const mobileSearchInput = document.getElementById('gi-mobile-search-input');
-    const mobileMenuBtn = document.getElementById('gi-mobile-menu-btn');
-    const mobileOverlay = document.getElementById('gi-mobile-overlay');
-    const mobileMenu = document.getElementById('gi-mobile-menu');
-    const mobileClose = document.getElementById('gi-mobile-close');
-    
-    // State
-    let lastScrollTop = 0;
-    let isSearchOpen = false;
-    let isMobileMenuOpen = false;
-    
-    // ===============================================
-    // SCROLL BEHAVIOR
-    // ===============================================
-    function handleScroll() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Hide/show header on scroll (only when scrolling down significantly)
-        if (scrollTop > lastScrollTop && scrollTop > 150 && !isMobileMenuOpen && !isSearchOpen) {
-            header.classList.add('hidden');
-        } else {
-            header.classList.remove('hidden');
-        }
-        
-        // Add scrolled effect
-        if (scrollTop > 20) {
+    // Desktop: Add scrolled class for shadow effect
+    if (window.innerWidth >= 768) {
+        if (currentScrollY > 10) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
-        
-        lastScrollTop = scrollTop;
     }
     
-    // Throttled scroll handler for better performance
-    let scrollTimeout;
-    window.addEventListener('scroll', function() {
-        if (scrollTimeout) {
-            clearTimeout(scrollTimeout);
-        }
-        scrollTimeout = setTimeout(handleScroll, 10);
-    });
-    
-    // ===============================================
-    // SEARCH FUNCTIONALITY
-    // ===============================================
-    function toggleSearch() {
-        isSearchOpen = !isSearchOpen;
-        
-        if (isSearchOpen) {
-            searchBar.classList.add('show');
-            searchBar.classList.remove('gi-hidden');
-            header.classList.remove('hidden'); // Always show header when search is open
-            
-            // Focus on search input after animation
-            setTimeout(() => {
-                searchInput?.focus();
-            }, 150);
-            
-            // Update toggle button
-            if (searchToggle) {
-                searchToggle.innerHTML = '<i class="fas fa-times"></i>';
-                searchToggle.title = '検索を閉じる';
-            }
-        } else {
-            searchBar.classList.remove('show');
-            setTimeout(() => {
-                searchBar.classList.add('gi-hidden');
-            }, 300);
-            
-            // Reset toggle button
-            if (searchToggle) {
-                searchToggle.innerHTML = '<i class="fas fa-search"></i>';
-                searchToggle.title = '詳細検索';
-            }
-        }
-    }
-    
-    searchToggle?.addEventListener('click', toggleSearch);
-    
-    // Search form submission with loading state
-    if (searchForm) {
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Show loading state
-            const submitBtn = this.querySelector('.gi-search-submit');
-            if (submitBtn) {
-                submitBtn.classList.add('gi-loading');
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>検索中...</span>';
-            }
-            
-            const formData = new FormData(this);
-            const params = new URLSearchParams();
-            
-            for (const [key, value] of formData.entries()) {
-                if (value.trim()) {
-                    params.append(key, value);
-                }
-            }
-            
-            const archiveUrl = '<?php echo esc_url(get_post_type_archive_link("grant")); ?>';
-            const searchUrl = archiveUrl + (params.toString() ? '?' + params.toString() : '');
-            
-            // Small delay to show loading state
-            setTimeout(() => {
-                window.location.href = searchUrl;
-            }, 500);
-        });
-    }
-    
-    // Mobile search functionality
-    if (mobileSearchInput) {
-        mobileSearchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const query = this.value.trim();
-                if (query) {
-                    const archiveUrl = '<?php echo esc_url(get_post_type_archive_link("grant")); ?>';
-                    window.location.href = archiveUrl + '?search=' + encodeURIComponent(query);
-                }
-            }
-        });
-    }
-    
-    // ===============================================
-    // MOBILE MENU
-    // ===============================================
-    function openMobileMenu() {
-        isMobileMenuOpen = true;
-        mobileOverlay?.classList.add('show');
-        mobileMenu?.classList.add('show');
-        header.classList.remove('hidden'); // Always show header when menu is open
-        document.body.style.overflow = 'hidden';
-        
-        // Focus management
-        setTimeout(() => {
-            const firstFocusable = mobileMenu?.querySelector('input, a, button');
-            firstFocusable?.focus();
-        }, 400);
-    }
-    
-    function closeMobileMenu() {
-        isMobileMenuOpen = false;
-        mobileOverlay?.classList.remove('show');
-        mobileMenu?.classList.remove('show');
-        document.body.style.overflow = '';
-        
-        // Return focus to menu button
-        mobileMenuBtn?.focus();
-    }
-    
-    mobileMenuBtn?.addEventListener('click', openMobileMenu);
-    mobileClose?.addEventListener('click', closeMobileMenu);
-    
-    // Close on overlay click
-    mobileOverlay?.addEventListener('click', function(e) {
-        if (e.target === mobileOverlay) {
-            closeMobileMenu();
-        }
-    });
-    
-    // ===============================================
-    // KEYBOARD NAVIGATION
-    // ===============================================
-    document.addEventListener('keydown', function(e) {
-        // Escape key handlers
-        if (e.key === 'Escape') {
-            if (isMobileMenuOpen) {
-                closeMobileMenu();
-            } else if (isSearchOpen) {
-                toggleSearch();
-            }
-        }
-        
-        // Search shortcut (Ctrl/Cmd + K)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            if (!isSearchOpen) {
-                toggleSearch();
-            }
-        }
-    });
-    
-    // Focus trap for mobile menu
-    if (mobileMenu) {
-        mobileMenu.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab') {
-                const focusableElements = this.querySelectorAll('input, a, button');
-                const firstElement = focusableElements[0];
-                const lastElement = focusableElements[focusableElements.length - 1];
-                
-                if (e.shiftKey && document.activeElement === firstElement) {
-                    e.preventDefault();
-                    lastElement.focus();
-                } else if (!e.shiftKey && document.activeElement === lastElement) {
-                    e.preventDefault();
-                    firstElement.focus();
-                }
-            }
-        });
-    }
-    
-    // ===============================================
-    // PERFORMANCE OPTIMIZATIONS
-    // ===============================================
-    
-    // Intersection Observer for animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const animationObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('gi-animate-fade-up');
-            }
-        });
-    }, observerOptions);
-    
-    // Observe animated elements
-    document.querySelectorAll('.gi-nav-link, .gi-btn').forEach(el => {
-        animationObserver.observe(el);
-    });
-    
-    // ===============================================
-    // ACCESSIBILITY ENHANCEMENTS
-    // ===============================================
-    
-    // Announce search state changes to screen readers
-    function announceToScreenReader(message) {
-        const announcement = document.createElement('div');
-        announcement.setAttribute('aria-live', 'polite');
-        announcement.setAttribute('aria-atomic', 'true');
-        announcement.className = 'gi-hidden';
-        announcement.textContent = message;
-        
-        document.body.appendChild(announcement);
-        
-        setTimeout(() => {
-            document.body.removeChild(announcement);
-        }, 1000);
-    }
-    
-    // Announce when search opens/closes
-    const originalToggleSearch = toggleSearch;
-    toggleSearch = function() {
-        originalToggleSearch();
-        announceToScreenReader(isSearchOpen ? '検索フォームが開きました' : '検索フォームが閉じました');
-    };
-    
-    // ===============================================
-    // INITIALIZATION
-    // ===============================================
-    
-    // Set initial states
-    searchBar?.classList.add('gi-hidden');
-    
-    // Add loaded class for any CSS transitions
-    setTimeout(() => {
-        document.body.classList.add('gi-loaded');
-    }, 100);
-    
-    console.log('🚀 Grant Insight Clean Header initialized successfully!');
-    
-    // ===============================================
-    // GLOBAL API
-    // ===============================================
-    
-    // Expose useful functions globally
-    window.GI_CleanHeader = {
-        toggleSearch: toggleSearch,
-        openMobileMenu: openMobileMenu,
-        closeMobileMenu: closeMobileMenu,
-        isSearchOpen: () => isSearchOpen,
-        isMobileMenuOpen: () => isMobileMenuOpen
-    };
-});
-</script>
-
-<!-- Main Content Area -->
-<main id="main-content" class="gi-main-content" style="margin-top: 4.5rem;">
-<?php 
-$hasAnnouncement = get_theme_mod('gi_show_announcement', true);
-if ($hasAnnouncement): 
-?>
-<script>
-// Adjust main content margin if announcement bar is present
-document.getElementById('main-content').style.marginTop = '6.25rem';
-
-// On larger screens
-if (window.innerWidth >= 1024) {
-    document.getElementById('main-content').style.marginTop = '7.25rem';
+    lastScrollY = currentScrollY;
 }
+
+// Mobile menu functions
+function openMobileMenu() {
+    document.getElementById('mobileMenu').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMobileMenu(event) {
+    if (!event || event.target.classList.contains('mobile-menu') || event.target.classList.contains('mobile-menu-close')) {
+        document.getElementById('mobileMenu').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Search function placeholder
+function openSearch() {
+    // Implement search functionality
+    window.location.href = '<?php echo home_url('/grants/'); ?>';
+}
+
+// Event listeners
+window.addEventListener('scroll', handleScroll, { passive: true });
+window.addEventListener('resize', () => {
+    // Close mobile menu on desktop
+    if (window.innerWidth >= 768) {
+        closeMobileMenu({ target: { classList: { contains: () => true } } });
+    }
+});
+
+// Close mobile menu on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeMobileMenu({ target: { classList: { contains: () => true } } });
+    }
+});
+
+// Initialize
+handleScroll();
 </script>
-<?php endif; ?>
+
+<?php wp_body_open(); ?>

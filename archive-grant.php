@@ -166,33 +166,33 @@ $all_prefectures = get_terms([
     
     <!-- Critical CSS -->
     <style>
-    /* ===== Clean & Professional Design System ===== */
+    /* ===== Clean & Professional Design System - Monochrome Edition ===== */
     :root {
-        /* Core Colors - Clean & Professional */
-        --primary: #2563eb;
-        --primary-light: #3b82f6;
-        --primary-dark: #1d4ed8;
-        --secondary: #64748b;
-        --accent: #0ea5e9;
+        /* Core Colors - Stylish Monochrome */
+        --primary: #000000;
+        --primary-light: #262626;
+        --primary-dark: #000000;
+        --secondary: #525252;
+        --accent: #171717;
         
-        /* Neutral Colors */
+        /* Neutral Colors - Monochrome Palette */
         --white: #ffffff;
-        --gray-50: #f8fafc;
-        --gray-100: #f1f5f9;
-        --gray-200: #e2e8f0;
-        --gray-300: #cbd5e1;
-        --gray-400: #94a3b8;
-        --gray-500: #64748b;
-        --gray-600: #475569;
-        --gray-700: #334155;
-        --gray-800: #1e293b;
-        --gray-900: #0f172a;
+        --gray-50: #fafafa;
+        --gray-100: #f5f5f5;
+        --gray-200: #e5e5e5;
+        --gray-300: #d4d4d4;
+        --gray-400: #a3a3a3;
+        --gray-500: #737373;
+        --gray-600: #525252;
+        --gray-700: #404040;
+        --gray-800: #262626;
+        --gray-900: #171717;
         
         /* Semantic Colors */
-        --success: #16a34a;
-        --warning: #d97706;
-        --danger: #dc2626;
-        --info: #0ea5e9;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #000000;
         
         /* Typography */
         --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -1893,7 +1893,7 @@ $all_prefectures = get_terms([
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: ${type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : '#2563eb'};
+            background: ${type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : '#000000'};
             color: white;
             padding: 1rem 1.5rem;
             border-radius: 0.5rem;

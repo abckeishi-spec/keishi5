@@ -31,7 +31,8 @@ $required_files = array(
     '7-acf-setup.php',                // ACF関連
     '8-acf-fields-setup.php',         // ACFフィールド定義
     '9-mobile-optimization.php',      // モバイル最適化機能
-    '10-performance-helpers.php'      // パフォーマンス最適化ヘルパー
+    '10-performance-helpers.php',     // パフォーマンス最適化ヘルパー
+    '12-ai-functions.php'             // AI システム - 検索・相談・推薦機能
 );
 
 // 各ファイルを安全に読み込み
