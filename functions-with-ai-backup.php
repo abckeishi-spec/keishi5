@@ -1,6 +1,6 @@
 <?php
 /**
- * Grant Insight Perfect - Functions File Loader (AI機能無効版)
+ * Grant Insight Perfect - Functions File Loader
  * @package Grant_Insight_Perfect
  */
 
@@ -17,10 +17,10 @@ if (!defined('GI_THEME_PREFIX')) {
     define('GI_THEME_PREFIX', 'gi_');
 }
 
-// 機能ファイルの読み込み（AI機能を除外）
+// 機能ファイルの読み込み
 $inc_dir = get_template_directory() . '/inc/';
 
-// AI関連ファイルを除いた基本ファイル
+// ファイル存在チェックを追加
 $required_files = array(
     '1-theme-setup-optimized.php',    // テーマ基本設定、スクリプト（最適化版）
     '2-post-types.php',               // 投稿タイプ、タクソノミー
@@ -32,9 +32,9 @@ $required_files = array(
     '8-acf-fields-setup.php',         // ACFフィールド定義
     '9-mobile-optimization.php',      // モバイル最適化機能
     '10-performance-helpers.php',     // パフォーマンス最適化ヘルパー
-    // '12-ai-functions.php',         // AI システム - 一時的に無効化
-    // '13-security-manager.php',     // セキュリティ管理 - 一時的に無効化
-    // '14-error-handler.php'         // エラーハンドリング - 一時的に無効化
+    '12-ai-functions.php',            // AI システム - 検索・相談・推薦機能
+    '13-security-manager.php',        // セキュリティ管理・プライバシー保護
+    '14-error-handler.php'            // エラーハンドリング・フォールバック
 );
 
 // 各ファイルを安全に読み込み
@@ -42,9 +42,11 @@ foreach ($required_files as $file) {
     $file_path = $inc_dir . $file;
     if (file_exists($file_path)) {
         require_once $file_path;
-        error_log("読み込み成功: " . $file);
     } else {
-        error_log("ファイル未発見: " . $file_path);
+        // デバッグモードの場合はエラーログに記録
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Grant Insight Theme: Required file not found - ' . $file_path);
+        }
     }
 }
 
@@ -55,13 +57,17 @@ $card_unified_path = get_template_directory() . '/template-parts/grant-card-unif
 if (file_exists($card_renderer_path)) {
     require_once $card_renderer_path;
 } else {
-    error_log('GrantCardRenderer class not found at ' . $card_renderer_path);
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Grant Insight Theme: GrantCardRenderer class not found at ' . $card_renderer_path);
+    }
 }
 
 if (file_exists($card_unified_path)) {
     require_once $card_unified_path;
 } else {
-    error_log('grant-card-unified.php not found at ' . $card_unified_path);
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Grant Insight Theme: grant-card-unified.php not found at ' . $card_unified_path);
+    }
 }
 
 // グローバルで使えるヘルパー関数
@@ -78,61 +84,17 @@ if (!function_exists('gi_render_card')) {
 }
 
 /**
- * AI機能のフォールバック関数群
- */
-
-// AI機能が無効化されている場合のフォールバック
-if (!class_exists('GI_AI_System')) {
-    class GI_AI_System {
-        public static function getInstance() {
-            return new self();
-        }
-        
-        public function handle_ai_consultation() {
-            wp_send_json_error('AI機能は現在無効化されています');
-        }
-        
-        public function handle_ai_search() {
-            wp_send_json_error('AI検索機能は現在無効化されています');
-        }
-        
-        public function handle_ai_recommendation() {
-            wp_send_json_error('AI推薦機能は現在無効化されています');
-        }
-    }
-}
-
-if (!class_exists('GI_Security_Manager')) {
-    class GI_Security_Manager {
-        public static function getInstance() {
-            return new self();
-        }
-        
-        public function sanitize_ai_input($input) {
-            return sanitize_text_field($input);
-        }
-    }
-}
-
-if (!class_exists('GI_Error_Handler')) {
-    class GI_Error_Handler {
-        public static function getInstance() {
-            return new self();
-        }
-        
-        public function handleError($error) {
-            error_log('Error handled: ' . $error);
-        }
-    }
-}
-
-/**
  * テーマの最終初期化
  */
-function gi_final_init() {
-    error_log('Grant Insight Theme v' . GI_THEME_VERSION . ': AI機能無効版で初期化完了');
+function gi_final_init() {  // ✅ 修正
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('Grant Insight Theme v' . GI_THEME_VERSION . ': Mobile optimization included, initialization completed successfully');
+    }
 }
 add_action('wp_loaded', 'gi_final_init', 999);
+
+// 以下のコードはそのまま...
+
 
 /**
  * クリーンアップ処理
@@ -192,6 +154,8 @@ if (!function_exists('gi_add_defer_attribute')) {
 // フィルターの重複登録を防ぐ
 remove_filter('script_loader_tag', 'gi_add_defer_attribute', 10);
 add_filter('script_loader_tag', 'gi_add_defer_attribute', 10, 3);
+
+// モバイル専用テンプレート切り替えは削除（統合されました）
 
 /**
  * モバイル用AJAX エンドポイント - さらに読み込み
@@ -276,11 +240,13 @@ add_action('after_setup_theme', 'gi_theme_activation_check');
  */
 if (!function_exists('gi_log_error')) {
     function gi_log_error($message, $context = array()) {
-        $log_message = '[Grant Insight Error] ' . $message;
-        if (!empty($context)) {
-            $log_message .= ' | Context: ' . print_r($context, true);
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $log_message = '[Grant Insight Error] ' . $message;
+            if (!empty($context)) {
+                $log_message .= ' | Context: ' . print_r($context, true);
+            }
+            error_log($log_message);
         }
-        error_log($log_message);
     }
 }
 
@@ -311,6 +277,8 @@ if (!function_exists('gi_update_theme_option')) {
     }
 }
 
+
+
 /**
  * テーマのバージョンアップグレード処理
  */
@@ -339,7 +307,7 @@ function gi_theme_version_upgrade() {
         if (is_admin()) {
             add_action('admin_notices', function() {
                 echo '<div class="notice notice-success is-dismissible"><p>';
-                echo 'Grant Insight テーマが v' . GI_THEME_VERSION . ' にアップグレードされました（AI機能無効版）。';
+                echo 'Grant Insight テーマが v' . GI_THEME_VERSION . ' にアップグレードされました。';
                 echo '</p></div>';
             });
         }
@@ -347,6 +315,6 @@ function gi_theme_version_upgrade() {
 }
 add_action('init', 'gi_theme_version_upgrade');
 
-// デバッグ情報
-error_log("📋 Grant Insight Theme: AI機能無効版のfunctions.phpが読み込まれました");
-?>
+/**
+ * AJAXハンドラーの登録確認
+ */
