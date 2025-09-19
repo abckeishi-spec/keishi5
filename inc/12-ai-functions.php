@@ -1897,29 +1897,57 @@ class GI_AI_System {
      * 高度なAIエンジンの初期化 - 機械学習・深層学習・神経網処理
      */
     private function init_advanced_engines() {
-        // 学習エンジンの初期化
-        $this->learning_engine = new GI_Learning_Engine();
+        // 学習エンジンの初期化（安全なチェック付き）
+        if (class_exists('GI_Learning_Engine')) {
+            $this->learning_engine = new GI_Learning_Engine();
+        } else {
+            $this->learning_engine = null;
+        }
         
-        // コンテキストエンジンの初期化
-        $this->context_engine = new GI_Context_Engine();
+        // コンテキストエンジンの初期化（安全なチェック付き）
+        if (class_exists('GI_Context_Engine')) {
+            $this->context_engine = new GI_Context_Engine();
+        } else {
+            $this->context_engine = null;
+        }
         
-        // パーソナライゼーションエンジンの初期化
-        $this->personalization_engine = new GI_Personalization_Engine();
+        // パーソナライゼーションエンジンの初期化（安全なチェック付き）
+        if (class_exists('GI_Personalization_Engine')) {
+            $this->personalization_engine = new GI_Personalization_Engine();
+        } else {
+            $this->personalization_engine = null;
+        }
         
-        // アナリティクスエンジンの初期化
-        $this->analytics_engine = new GI_Analytics_Engine();
+        // アナリティクスエンジンの初期化（安全なチェック付き）
+        if (class_exists('GI_Analytics_Engine')) {
+            $this->analytics_engine = new GI_Analytics_Engine();
+        } else {
+            $this->analytics_engine = null;
+        }
         
-        // 高度アルゴリズム配列の初期化
-        $this->advanced_algorithms = array(
-            'semantic_search' => new GI_Semantic_Search_Algorithm(),
-            'intent_recognition' => new GI_Intent_Recognition_Algorithm(),
-            'sentiment_analysis' => new GI_Sentiment_Analysis_Algorithm(),
-            'recommendation_engine' => new GI_Recommendation_Algorithm(),
-            'predictive_analytics' => new GI_Predictive_Analytics_Algorithm(),
-            'natural_language_processing' => new GI_NLP_Algorithm(),
-            'contextual_understanding' => new GI_Contextual_Algorithm(),
-            'behavioral_prediction' => new GI_Behavioral_Prediction_Algorithm()
+        // 高度アルゴリズム配列の初期化（安全なチェック付き）
+        $this->advanced_algorithms = array();
+        
+        // 各アルゴリズムクラスの安全な初期化
+        $algorithm_classes = array(
+            'semantic_search' => 'GI_Semantic_Search_Algorithm',
+            'intent_recognition' => 'GI_Intent_Recognition_Algorithm',
+            'sentiment_analysis' => 'GI_Sentiment_Analysis_Algorithm',
+            'recommendation_engine' => 'GI_Recommendation_Algorithm',
+            'predictive_analytics' => 'GI_Predictive_Analytics_Algorithm',
+            'natural_language_processing' => 'GI_NLP_Algorithm',
+            'contextual_understanding' => 'GI_Contextual_Algorithm',
+            'behavioral_prediction' => 'GI_Behavioral_Prediction_Algorithm'
         );
+        
+        foreach ($algorithm_classes as $key => $class_name) {
+            if (class_exists($class_name)) {
+                $this->advanced_algorithms[$key] = new $class_name();
+            } else {
+                // フォールバック用の基本オブジェクト
+                $this->advanced_algorithms[$key] = null;
+            }
+        }
     }
 
     /**

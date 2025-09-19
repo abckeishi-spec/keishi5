@@ -93,13 +93,9 @@ html {
     <section class="front-page-section section-animate" id="search-section">
         <?php 
         try {
-            // Load original advanced search section
-            get_template_part('template-parts/front-page/section', 'search');
-            echo '<div style="color: green; padding: 5px; background: #e8f5e8;">✅ Advanced Search Section Loaded</div>';
+            get_template_part('template-parts/front-page/section', 'search-minimal');
         } catch (Exception $e) {
             echo '<div style="color: red;">Search section error: ' . $e->getMessage() . '</div>';
-            // Fallback to minimal version
-            get_template_part('template-parts/front-page/section', 'search-minimal');
         }
         ?>
     </section>
