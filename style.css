@@ -7,41 +7,257 @@ Text Domain: grant-insight-perfect
 */
 
 /* ==========================================================================
-   CSS変数定義 - 一元管理
+   PROFESSIONAL DESIGN SYSTEM - Unified Variables & Tokens
    ========================================================================== */
+
+/* ========================================
+   CORE BRAND COLORS - Purple & Monochrome Professional System
+   ======================================== */
 :root {
-    --color-primary: #059669;
-    --color-primary-dark: #047857;
-    --color-primary-darker: #065f46;
-    --color-primary-light: #10b981;
-    --color-secondary: #0891b2;
-    --color-white: #ffffff;
-    --color-gray-50: #f9fafb;
-    --color-gray-100: #f3f4f6;
-    --color-gray-200: #e5e7eb;
-    --color-gray-300: #d1d5db;
-    --color-gray-400: #9ca3af;
-    --color-gray-500: #6b7280;
-    --color-gray-600: #4b5563;
-    --color-gray-700: #374151;
-    --color-gray-800: #1f2937;
-    --color-gray-900: #111827;
+    /* Primary Brand Colors - Stylish Monochrome with Subtle Accents */
+    --brand-primary: #000000;          /* Pure Black - Main brand */
+    --brand-primary-50: #fafafa;
+    --brand-primary-100: #f5f5f5;
+    --brand-primary-200: #e5e5e5;
+    --brand-primary-300: #d4d4d4;
+    --brand-primary-400: #a3a3a3;
+    --brand-primary-500: #737373;      /* Mid Gray */
+    --brand-primary-600: #525252;      /* Dark Gray */
+    --brand-primary-700: #404040;      /* Darker Gray */
+    --brand-primary-800: #262626;      /* Nearly Black */
+    --brand-primary-900: #171717;      /* Almost Black */
     
-    --z-dropdown: 50;
+    /* Secondary Accent - Sophisticated Gray Scale */
+    --brand-secondary: #1f2937;        /* Dark Slate Gray */
+    --brand-secondary-50: #f9fafb;
+    --brand-secondary-100: #f3f4f6;
+    --brand-secondary-200: #e5e7eb;
+    --brand-secondary-300: #d1d5db;
+    --brand-secondary-400: #9ca3af;
+    --brand-secondary-500: #6b7280;    /* Secondary */
+    --brand-secondary-600: #4b5563;
+    --brand-secondary-700: #374151;
+    
+    /* Professional Neutral Palette */
+    --neutral-white: #ffffff;
+    --neutral-50: #f8fafc;
+    --neutral-100: #f1f5f9;
+    --neutral-200: #e2e8f0;
+    --neutral-300: #cbd5e1;
+    --neutral-400: #94a3b8;
+    --neutral-500: #64748b;
+    --neutral-600: #475569;
+    --neutral-700: #334155;
+    --neutral-800: #1e293b;
+    --neutral-900: #0f172a;
+    
+    /* Semantic Colors - Consistent & Minimal */
+    --semantic-success: #22c55e;       /* Green 500 */
+    --semantic-warning: #f59e0b;       /* Amber 500 */
+    --semantic-danger: #ef4444;        /* Red 500 */
+    --semantic-info: #3b82f6;          /* Blue 500 */
+    
+    /* Light Semantic Variants */
+    --semantic-success-50: #f0fdf4;
+    --semantic-warning-50: #fffbeb;
+    --semantic-danger-50: #fef2f2;
+    --semantic-info-50: #eff6ff;
+    
+    /* ========================================
+       LEGACY COMPATIBILITY - Maintain Existing Variables
+       ======================================== */
+    /* Map existing variables to new system for backward compatibility */
+    --color-primary: var(--brand-primary);
+    --color-primary-dark: var(--brand-primary-600);
+    --color-primary-darker: var(--brand-primary-700);
+    --color-primary-light: var(--brand-primary-400);
+    --color-secondary: var(--brand-secondary);
+    --color-white: var(--neutral-white);
+    --color-gray-50: var(--neutral-50);
+    --color-gray-100: var(--neutral-100);
+    --color-gray-200: var(--neutral-200);
+    --color-gray-300: var(--neutral-300);
+    --color-gray-400: var(--neutral-400);
+    --color-gray-500: var(--neutral-500);
+    --color-gray-600: var(--neutral-600);
+    --color-gray-700: var(--neutral-700);
+    --color-gray-800: var(--neutral-800);
+    --color-gray-900: var(--neutral-900);
+    
+    /* ========================================
+       GRADIENT SYSTEM - Professional Combinations
+       ======================================== */
+    --gradient-primary: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-600) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-secondary-600) 100%);
+    --gradient-purple-blue: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%);
+    --gradient-subtle: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+    --gradient-dark: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-900) 100%);
+    
+    /* ========================================
+       TYPOGRAPHY SYSTEM
+       ======================================== */
+    --font-primary: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    --font-secondary: 'Inter Display', 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    
+    /* Font Sizes - Consistent Scale */
+    --text-xs: 0.75rem;      /* 12px */
+    --text-sm: 0.875rem;     /* 14px */
+    --text-base: 1rem;       /* 16px */
+    --text-lg: 1.125rem;     /* 18px */
+    --text-xl: 1.25rem;      /* 20px */
+    --text-2xl: 1.5rem;      /* 24px */
+    --text-3xl: 1.875rem;    /* 30px */
+    --text-4xl: 2.25rem;     /* 36px */
+    
+    /* ========================================
+       SPACING SYSTEM - Consistent Scale
+       ======================================== */
+    --space-1: 0.25rem;     /* 4px */
+    --space-2: 0.5rem;      /* 8px */
+    --space-3: 0.75rem;     /* 12px */
+    --space-4: 1rem;        /* 16px */
+    --space-5: 1.25rem;     /* 20px */
+    --space-6: 1.5rem;      /* 24px */
+    --space-8: 2rem;        /* 32px */
+    --space-10: 2.5rem;     /* 40px */
+    --space-12: 3rem;       /* 48px */
+    --space-16: 4rem;       /* 64px */
+    
+    /* ========================================
+       BORDER RADIUS SYSTEM
+       ======================================== */
+    --radius-sm: 0.25rem;    /* 4px */
+    --radius-base: 0.375rem; /* 6px */
+    --radius-md: 0.5rem;     /* 8px */
+    --radius-lg: 0.75rem;    /* 12px */
+    --radius-xl: 1rem;       /* 16px */
+    --radius-2xl: 1.5rem;    /* 24px */
+    --radius-full: 9999px;
+    
+    /* ========================================
+       SHADOW SYSTEM - Professional Depths
+       ======================================== */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    
+    /* Brand Colored Shadows - Monochrome */
+    --shadow-primary: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-secondary: 0 10px 15px -3px rgb(31 41 55 / 0.15), 0 4px 6px -4px rgb(31 41 55 / 0.1);
+    
+    /* ========================================
+       TRANSITION & ANIMATION SYSTEM
+       ======================================== */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Legacy Compatibility */
+    --transition-normal: var(--transition-base);
+    
+    /* ========================================
+       COMPONENT SYSTEM
+       ======================================== */
+    /* Cards */
+    --card-padding: var(--space-6);
+    --card-border-radius: var(--radius-xl);
+    --card-shadow: var(--shadow-sm);
+    --card-shadow-hover: var(--shadow-lg);
+    --card-border-color: var(--neutral-200);
+    
+    /* Buttons */
+    --btn-height-sm: 2rem;
+    --btn-height-md: 2.5rem;
+    --btn-height-lg: 3rem;
+    --btn-padding-x: var(--space-4);
+    --btn-border-radius: var(--radius-md);
+    
+    /* Forms */
+    --input-height: var(--btn-height-md);
+    --input-padding-x: var(--space-3);
+    --input-border-color: var(--neutral-300);
+    --input-border-radius: var(--radius-md);
+    
+    /* ========================================
+       Z-INDEX SCALE
+       ======================================== */
+    --z-base: 0;
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-toast: 1080;
+    
+    /* Legacy Z-Index Compatibility */
     --z-header: 100;
     --z-overlay: 300;
     --z-sidebar: 310;
-    --z-modal: 400;
     --z-notification: 500;
     
+    /* ========================================
+       LAYOUT SYSTEM
+       ======================================== */
     --header-height: 80px;
     --mobile-menu-width: 320px;
-    
-    --transition-fast: 0.2s ease;
-    --transition-normal: 0.3s ease;
-    --transition-slow: 0.5s ease;
-    
-    --font-primary: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --container-max-width: 1200px;
+    --container-padding: var(--space-6);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN TOKENS
+   ======================================== */
+@media (max-width: 768px) {
+    :root {
+        --container-padding: var(--space-4);
+        --card-padding: var(--space-4);
+    }
+}
+
+/* ========================================
+   DARK MODE SUPPORT (Auto-detection)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --neutral-white: var(--neutral-900);
+        --neutral-50: var(--neutral-800);
+        --neutral-100: var(--neutral-700);
+        --neutral-200: var(--neutral-600);
+        --neutral-300: var(--neutral-500);
+        --neutral-400: var(--neutral-400);
+        --neutral-500: var(--neutral-300);
+        --neutral-600: var(--neutral-200);
+        --neutral-700: var(--neutral-100);
+        --neutral-800: var(--neutral-50);
+        --neutral-900: var(--neutral-white);
+        --card-border-color: var(--neutral-700);
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY ENHANCEMENTS
+   ======================================== */
+@media (prefers-contrast: high) {
+    :root {
+        --card-border-width: 2px;
+        --btn-border-width: 2px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --transition-fast: 0ms;
+        --transition-base: 0ms;
+        --transition-slow: 0ms;
+        --transition-bounce: 0ms;
+    }
 }
 
 /* ==========================================================================

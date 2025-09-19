@@ -70,19 +70,31 @@ add_action('after_setup_theme', 'gi_content_width', 0);
  * スクリプト・スタイルの読み込み（最小限）
  */
 function gi_enqueue_scripts() {
+    // Tailwind CSS CDN (Required for template styles)
+    wp_enqueue_style('tailwind-css', 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css', array(), '2.2.19');
+    
     // メインスタイルシート
-    wp_enqueue_style('gi-style', get_stylesheet_uri(), array(), GI_THEME_VERSION);
+    wp_enqueue_style('gi-style', get_stylesheet_uri(), array('tailwind-css'), GI_THEME_VERSION);
     
     // 統合されたメインCSS
-    wp_enqueue_style('gi-main-css', get_template_directory_uri() . '/assets/css/main.css', array(), GI_THEME_VERSION);
+    wp_enqueue_style('gi-main-css', get_template_directory_uri() . '/assets/css/main.css', array('tailwind-css'), GI_THEME_VERSION);
     
     // Google Fonts（日本語フォント）
     wp_enqueue_style('google-fonts-noto', 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap', array(), null);
     
-    // メインJavaScript
-    wp_enqueue_script('gi-main', get_template_directory_uri() . '/assets/js/main.js', array('jquery'), GI_THEME_VERSION, true);
+    // エラーハンドリングJavaScript（最優先で読み込み）
+    wp_enqueue_script('gi-error-handler', get_template_directory_uri() . '/assets/js/error-handler.js', array(), GI_THEME_VERSION, true);
     
-    // AJAX設定（必要に応じてmain.jsで使用）
+    // メインJavaScript
+    wp_enqueue_script('gi-main', get_template_directory_uri() . '/assets/js/main.js', array('jquery', 'gi-error-handler'), GI_THEME_VERSION, true);
+    
+    // AJAX設定（グローバル変数として設定）
+    wp_localize_script('gi-error-handler', 'giAjax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('gi_ajax_nonce')
+    ));
+    
+    // 追加のAJAX設定（下位互換性）
     wp_localize_script('gi-main', 'gi_ajax', array(
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('gi_ajax_nonce')

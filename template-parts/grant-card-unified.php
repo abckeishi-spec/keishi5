@@ -144,7 +144,7 @@ if ($deadline_timestamp > 0) {
 // 難易度表示の設定
 $difficulty_config = array(
     'easy' => array('label' => '易しい', 'color' => '#16a34a', 'icon' => 'fa-smile'),
-    'normal' => array('label' => '普通', 'color' => '#2563eb', 'icon' => 'fa-meh'),
+    'normal' => array('label' => '普通', 'color' => '#525252', 'icon' => 'fa-meh'),
     'hard' => array('label' => '難しい', 'color' => '#d97706', 'icon' => 'fa-frown'),
     'expert' => array('label' => '専門的', 'color' => '#dc2626', 'icon' => 'fa-dizzy')
 );
@@ -157,50 +157,46 @@ static $assets_loaded = false;
 <?php if (!$assets_loaded): $assets_loaded = true; ?>
 
 <style>
-/* Clean Grant Card Design System - Monochrome + Light Purple Accent */
+/* Clean Grant Card Design System - Full Monochrome Edition */
 :root {
-    /* Core Colors - Light Purple Accent System */
-    --clean-primary: #a78bfa;          /* 薄い紫のアクセントカラー */
-    --clean-primary-light: #c4b5fd;    /* さらに薄い紫 */
-    --clean-primary-dark: #8b5cf6;     /* 少し濃い紫 */
-    --clean-secondary: #1f2937;        /* ダークグレー（ほぼ黒） */
-    --clean-accent: #a78bfa;           /* 薄い紫アクセント */
+    /* Core Colors - Pure Monochrome System */
+    --clean-primary: #000000;          /* Pure black for primary actions */
+    --clean-primary-light: #262626;    /* Dark gray for light primary */
+    --clean-primary-dark: #000000;     /* Pure black for dark primary */
+    --clean-secondary: #525252;        /* Medium gray for secondary elements */
+    --clean-accent: #171717;           /* Very dark gray for accents */
     
     /* Monochrome Base Colors */
-    --clean-white: #ffffff;            /* 純白 */
-    --clean-gray-50: #fafafa;          /* 最薄グレー */
-    --clean-gray-100: #f5f5f5;         /* 薄いグレー */
-    --clean-gray-200: #e5e5e5;         /* ライトグレー */
-    --clean-gray-300: #d4d4d4;         /* ミディアムライトグレー */
-    --clean-gray-400: #a3a3a3;         /* ミディアムグレー */
-    --clean-gray-500: #737373;         /* グレー */
-    --clean-gray-600: #525252;         /* ダークグレー */
-    --clean-gray-700: #404040;         /* より濃いグレー */
-    --clean-gray-800: #262626;         /* かなり濃いグレー */
-    --clean-gray-900: #171717;         /* ほぼ黒 */
+    --clean-white: #ffffff;            /* Pure white */
+    --clean-gray-50: #fafafa;          /* Lightest gray */
+    --clean-gray-100: #f5f5f5;         /* Very light gray */
+    --clean-gray-200: #e5e5e5;         /* Light gray */
+    --clean-gray-300: #d4d4d4;         /* Medium light gray */
+    --clean-gray-400: #a3a3a3;         /* Medium gray */
+    --clean-gray-500: #737373;         /* Gray */
+    --clean-gray-600: #525252;         /* Dark gray */
+    --clean-gray-700: #404040;         /* Darker gray */
+    --clean-gray-800: #262626;         /* Very dark gray */
+    --clean-gray-900: #171717;         /* Almost black */
     
-    /* Semantic Colors - Minimal Approach */
-    --clean-success: #22c55e;          /* 緑（最小限） */
-    --clean-warning: #f59e0b;          /* オレンジ（最小限） */
-    --clean-danger: #ef4444;           /* 赤（最小限） */
-    --clean-info: #a78bfa;             /* 薄い紫を情報色としても使用 */
+    /* Semantic Colors - Minimal Use */
+    --clean-success: #22c55e;          /* Green (minimal use) */
+    --clean-warning: #f59e0b;          /* Orange (minimal use) */
+    --clean-danger: #ef4444;           /* Red (minimal use) */
+    --clean-info: #000000;             /* Black for info */
     
-    /* Gradients - Monochrome + Light Purple */
-    --clean-gradient-primary: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    /* Gradients - Pure Monochrome */
+    --clean-gradient-primary: linear-gradient(135deg, #000000 0%, #262626 100%);
     --clean-gradient-light: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
     --clean-gradient-secondary: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
     --clean-gradient-dark: linear-gradient(135deg, #262626 0%, #171717 100%);
-    --clean-gradient-purple-light: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
+    --clean-gradient-accent: linear-gradient(135deg, #171717 0%, #000000 100%);
     
     /* Monochrome Shadows */
     --clean-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --clean-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.05);
     --clean-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
     --clean-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    
-    /* Light Purple Accent Shadows */
-    --clean-shadow-purple: 0 4px 6px -1px rgb(167 139 250 / 0.1), 0 2px 4px -2px rgb(167 139 250 / 0.05);
-    --clean-shadow-purple-lg: 0 10px 15px -3px rgb(167 139 250 / 0.15), 0 4px 6px -4px rgb(167 139 250 / 0.1);
     
     /* Border Radius - Clean & Modern */
     --clean-radius-sm: 0.25rem;
@@ -214,16 +210,16 @@ static $assets_loaded = false;
     --clean-transition-slow: all 0.3s ease-in-out;
     
     /* Typography Colors */
-    --clean-text-primary: #171717;     /* 主要テキスト（ほぼ黒） */
-    --clean-text-secondary: #525252;   /* セカンダリテキスト */
-    --clean-text-muted: #737373;       /* 薄いテキスト */
-    --clean-text-light: #a3a3a3;       /* 最も薄いテキスト */
+    --clean-text-primary: #171717;     /* Primary text (almost black) */
+    --clean-text-secondary: #525252;   /* Secondary text */
+    --clean-text-muted: #737373;       /* Muted text */
+    --clean-text-light: #a3a3a3;       /* Light text */
     
     /* Border Colors */
-    --clean-border-light: #e5e5e5;     /* 薄いボーダー */
-    --clean-border-medium: #d4d4d4;    /* ミディアムボーダー */
-    --clean-border-dark: #a3a3a3;      /* 濃いボーダー */
-    --clean-border-purple: #a78bfa;    /* 薄い紫ボーダー */
+    --clean-border-light: #e5e5e5;     /* Light border */
+    --clean-border-medium: #d4d4d4;    /* Medium border */
+    --clean-border-dark: #a3a3a3;      /* Dark border */
+    --clean-border-primary: #000000;   /* Primary border (black) */
 }
 
 	
@@ -272,7 +268,7 @@ static $assets_loaded = false;
 .grant-view-list .grant-card-unified:hover {
     box-shadow: var(--clean-shadow-lg);
     transform: translateX(4px);
-    border-color: var(--clean-primary);
+    border-color: var(--clean-gray-800);
 }
 
 .grant-view-list .grant-status-header {
@@ -361,7 +357,7 @@ static $assets_loaded = false;
 .grant-view-compact .grant-card-unified:hover {
     background: var(--clean-gray-50);
     box-shadow: var(--clean-shadow-md);
-    border-color: var(--clean-primary);
+    border-color: var(--clean-gray-800);
 }
 
 .grant-view-compact .grant-status-header {
@@ -500,7 +496,7 @@ static $assets_loaded = false;
 }
 
 .grant-title a:hover {
-    color: var(--clean-primary);
+    color: var(--clean-gray-800);
 }
 
 /* AI要約セクション */
@@ -520,14 +516,14 @@ static $assets_loaded = false;
 .grant-ai-summary:hover {
     transform: translateY(-1px);
     box-shadow: var(--clean-shadow-md);
-    border-color: var(--clean-primary);
+    border-color: var(--clean-gray-800);
 }
 
 .grant-ai-summary-label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--clean-accent);
+    color: var(--clean-gray-800);
     font-size: 0.75rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
@@ -571,7 +567,7 @@ static $assets_loaded = false;
 .grant-info-item:hover {
     transform: translateY(-1px);
     box-shadow: var(--clean-shadow-md);
-    border-color: var(--clean-primary);
+    border-color: var(--clean-gray-800);
 }
 
 .grant-info-icon {
@@ -598,18 +594,18 @@ static $assets_loaded = false;
 }
 
 .grant-info-item--target .grant-info-icon {
-    background: linear-gradient(135deg, var(--clean-success) 0%, #15803d 100%);
+    background: var(--clean-gradient-dark);
     color: var(--clean-white);
 }
 
 .grant-info-item--location .grant-info-icon {
-    background: linear-gradient(135deg, var(--clean-info) 0%, #0284c7 100%);
+    background: var(--clean-gradient-accent);
     color: var(--clean-white);
 }
 
 .grant-info-item--rate .grant-info-icon {
-    background: linear-gradient(135deg, var(--clean-warning) 0%, #b45309 100%);
-    color: var(--clean-white);
+    background: var(--clean-gradient-secondary);
+    color: var(--clean-gray-800);
 }
 
 .grant-info-content {
@@ -690,13 +686,13 @@ static $assets_loaded = false;
 .grant-btn--primary:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow: var(--clean-shadow-lg);
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    background: var(--clean-gradient-dark);
 }
 
 .grant-btn--secondary {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--clean-primary);
-    border: 2px solid rgba(37, 99, 235, 0.3);
+    background: var(--clean-gray-100);
+    color: var(--clean-gray-900);
+    border: 2px solid var(--clean-gray-300);
     box-shadow: var(--clean-shadow-sm);
 }
 
@@ -705,7 +701,7 @@ static $assets_loaded = false;
     color: var(--clean-white);
     transform: translateY(-1px) scale(1.01);
     box-shadow: var(--clean-shadow-md);
-    border-color: rgba(37, 99, 235, 0.5);
+    border-color: var(--clean-gray-500);
 }
 
 .favorite-btn {
@@ -789,12 +785,12 @@ static $assets_loaded = false;
 }
 
 .grant-hover-scrollable::-webkit-scrollbar-thumb {
-    background: var(--clean-primary);
+    background: var(--clean-gray-800);
     border-radius: 3px;
 }
 
 .grant-hover-scrollable::-webkit-scrollbar-thumb:hover {
-    background: var(--clean-primary-dark);
+    background: var(--clean-gray-900);
 }
 
 .grant-hover-details::before {
@@ -847,7 +843,7 @@ static $assets_loaded = false;
 }
 
 .grant-hover-close:hover {
-    background: var(--clean-primary);
+    background: var(--clean-gray-800);
     color: var(--clean-white);
     transform: rotate(90deg);
 }
@@ -879,7 +875,7 @@ static $assets_loaded = false;
     display: block;
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--clean-primary);
+    color: var(--clean-gray-900);
     margin-bottom: 0.375rem;
 }
 
@@ -910,7 +906,7 @@ static $assets_loaded = false;
 .grant-detail-section:hover {
     box-shadow: var(--clean-shadow-md);
     transform: translateY(-1px);
-    border-color: var(--clean-primary);
+    border-color: var(--clean-gray-800);
 }
 
 .grant-detail-label {
@@ -919,7 +915,7 @@ static $assets_loaded = false;
     gap: 0.5rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--clean-primary);
+    color: var(--clean-gray-800);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
@@ -1030,7 +1026,7 @@ static $assets_loaded = false;
     gap: 0.375rem;
     padding: 0.25rem 0.75rem;
     background: var(--clean-gray-100);
-    color: var(--clean-primary);
+    color: var(--clean-gray-800);
     border: 1px solid var(--clean-gray-200);
     border-radius: var(--clean-radius-2xl);
     font-size: 0.6875rem;
@@ -1039,7 +1035,7 @@ static $assets_loaded = false;
 }
 
 .grant-tag:hover {
-    background: var(--clean-primary);
+    background: var(--clean-gray-900);
     color: var(--clean-white);
     transform: scale(1.02);
 }
@@ -1074,7 +1070,7 @@ static $assets_loaded = false;
     bottom: 2rem;
     right: 2rem;
     padding: 1.25rem 1.5rem;
-    background: var(--clean-primary);
+    background: var(--clean-gray-900);
     color: var(--clean-white);
     border-radius: var(--clean-radius-lg);
     box-shadow: var(--clean-shadow-xl);
@@ -1102,7 +1098,7 @@ static $assets_loaded = false;
     justify-content: center;
     background: var(--clean-white);
     border-radius: 50%;
-    color: var(--clean-primary);
+    color: var(--clean-gray-900);
 }
 
 /* レスポンシブ対応 */
@@ -1206,7 +1202,7 @@ static $assets_loaded = false;
 @media (prefers-contrast: high) {
     .grant-card-unified {
         border-width: 2px;
-        border-color: var(--clean-primary);
+        border-color: var(--clean-gray-800);
     }
     
     .grant-btn {
@@ -1237,19 +1233,19 @@ static $assets_loaded = false;
 .grant-btn:focus,
 .favorite-btn:focus,
 .grant-hover-close:focus {
-    outline: 2px solid var(--clean-primary);
+    outline: 2px solid var(--clean-gray-800);
     outline-offset: 2px;
 }
 
 /* セレクション色 */
 ::selection {
-    background: rgba(37, 99, 235, 0.2);
-    color: var(--clean-primary);
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--clean-gray-900);
 }
 
 ::-moz-selection {
-    background: rgba(37, 99, 235, 0.2);
-    color: var(--clean-primary);
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--clean-gray-900);
 }
 
 /* スムーススクロール */
@@ -1420,7 +1416,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 position: fixed;
                 left: ${rect.left + rect.width / 2}px;
                 top: ${rect.top + rect.height / 2}px;
-                color: #2563eb;
+                color: #000000;
                 font-size: 1rem;
                 pointer-events: none;
                 z-index: 9999;
@@ -1560,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ボタンのフォーカス管理
     document.querySelectorAll('.grant-btn, .favorite-btn, .grant-hover-close').forEach(btn => {
         btn.addEventListener('focus', function() {
-            this.style.outline = '2px solid var(--clean-primary)';
+            this.style.outline = '2px solid var(--clean-gray-800)';
             this.style.outlineOffset = '2px';
         });
         
@@ -1831,22 +1827,10 @@ document.head.appendChild(style);
                     <span class="grant-stat-label">最大助成額</span>
                 </div>
                 <?php endif; ?>
-                <?php if ($subsidy_rate): ?>
-                <div class="grant-stat-item">
-                    <span class="grant-stat-value"><?php echo esc_html($subsidy_rate); ?></span>
-                    <span class="grant-stat-label">補助率</span>
-                </div>
-                <?php endif; ?>
                 <?php if ($grant_success_rate > 0): ?>
                 <div class="grant-stat-item">
                     <span class="grant-stat-value"><?php echo esc_html($grant_success_rate); ?>%</span>
                     <span class="grant-stat-label">採択率</span>
-                </div>
-                <?php endif; ?>
-                <?php if ($deadline_formatted): ?>
-                <div class="grant-stat-item">
-                    <span class="grant-stat-value"><?php echo esc_html($deadline_formatted); ?></span>
-                    <span class="grant-stat-label">締切日</span>
                 </div>
                 <?php endif; ?>
             </div>
