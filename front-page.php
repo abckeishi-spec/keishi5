@@ -7,7 +7,11 @@
  * @version 7.0-simple
  */
 
-get_header(); ?>
+get_header(); 
+
+// Debug: Check if we reach this point
+echo '<div style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999;">Front-page.php loaded!</div>';
+?>
 
 <style>
 /* フロントページ専用スタイル */
@@ -58,29 +62,62 @@ html {
      * メインビジュアルとキャッチコピー
      */
     ?>
+    <?php
+    // Debug: Test each section loading
+    echo '<div style="padding: 20px; background: #f0f0f0; margin: 10px 0; border: 2px solid #333;">';
+    echo '<h3>Loading Hero Section...</h3>';
+    ?>
     <section class="front-page-section section-animate" id="hero-section">
-        <?php get_template_part('template-parts/front-page/section', 'hero'); ?>
+        <?php 
+        try {
+            get_template_part('template-parts/front-page/section', 'hero');
+            echo '<div style="color: green;">Hero section loaded successfully</div>';
+        } catch (Exception $e) {
+            echo '<div style="color: red;">Hero section error: ' . $e->getMessage() . '</div>';
+        }
+        ?>
     </section>
+    <?php echo '</div>'; ?>
 
     <?php
     /**
      * 2. Search Section  
      * 助成金検索システム
      */
+    echo '<div style="padding: 20px; background: #e0e0e0; margin: 10px 0; border: 2px solid #333;">';
+    echo '<h3>Loading Search Section...</h3>';
     ?>
     <section class="front-page-section section-animate" id="search-section">
-        <?php get_template_part('template-parts/front-page/section', 'search'); ?>
+        <?php 
+        try {
+            get_template_part('template-parts/front-page/section', 'search');
+            echo '<div style="color: green;">Search section loaded successfully</div>';
+        } catch (Exception $e) {
+            echo '<div style="color: red;">Search section error: ' . $e->getMessage() . '</div>';
+        }
+        ?>
     </section>
+    <?php echo '</div>'; ?>
 
     <?php
     /**
      * 3. Categories Section
      * カテゴリ別ナビゲーション
      */
+    echo '<div style="padding: 20px; background: #d0d0d0; margin: 10px 0; border: 2px solid #333;">';
+    echo '<h3>Loading Categories Section...</h3>';
     ?>
     <section class="front-page-section section-animate" id="categories-section">
-        <?php get_template_part('template-parts/front-page/section', 'categories'); ?>
+        <?php 
+        try {
+            get_template_part('template-parts/front-page/section', 'categories');
+            echo '<div style="color: green;">Categories section loaded successfully</div>';
+        } catch (Exception $e) {
+            echo '<div style="color: red;">Categories section error: ' . $e->getMessage() . '</div>';
+        }
+        ?>
     </section>
+    <?php echo '</div>'; ?>
 
 </main>
 

@@ -2245,3 +2245,19 @@ function gi_check_api_health() { return 0.95; }
 function gi_check_database_performance() { return 0.92; }
 function gi_check_cache_efficiency() { return 0.88; }
 function gi_calculate_error_rate() { return 0.97; } // 1 - error_rate
+
+/**
+ * AI System initialization function
+ * Called by template files to initialize AI functionality
+ */
+if (!function_exists('gi_init_ai_system')) {
+    function gi_init_ai_system() {
+        static $ai_system = null;
+        
+        if ($ai_system === null) {
+            $ai_system = GI_AI_System::getInstance();
+        }
+        
+        return $ai_system;
+    }
+}
