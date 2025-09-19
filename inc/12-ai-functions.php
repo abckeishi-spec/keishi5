@@ -2547,8 +2547,6 @@ function gi_sanitize_filters($filters_string) {
     return $sanitized;
 }
 
-}
-
 /**
  * 🧠 Advanced Learning Engine Class
  * 機械学習ベースの学習エンジン
