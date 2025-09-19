@@ -26,6 +26,9 @@
             this.maxRetries = 3;
             this.debounceTimers = {};
             
+            // 新しいエラーハンドリングシステムとの統合
+            this.errorHandler = window.giErrorHandler || null;
+            
             this.init();
         }
 
@@ -434,9 +437,29 @@
         }
 
         /**
-         * AJAX リクエスト処理
+         * AJAX リクエスト処理 - 新しいエラーハンドリングシステムを使用
          */
         async makeAjaxRequest(requestData, type) {
+            // 新しいエラーハンドリングシステムを使用
+            if (this.errorHandler) {
+                try {
+                    const response = await this.errorHandler.makeRobustAjaxRequest(requestData, type);
+                    return response;
+                } catch (error) {
+                    // エラーハンドラーからのフォールバック応答を処理
+                    console.warn('Using fallback response from error handler');
+                    return error;
+                }
+            }
+            
+            // フォールバック: 従来のAJAXメソッド
+            return this.makeTraditionalAjaxRequest(requestData, type);
+        }
+
+        /**
+         * 従来のAJAXリクエスト処理（フォールバック用）
+         */
+        async makeTraditionalAjaxRequest(requestData, type) {
             const retryKey = type + '_' + Date.now();
             this.retryAttempts[retryKey] = 0;
 
