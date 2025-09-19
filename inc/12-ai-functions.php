@@ -37,6 +37,7 @@ class GI_AI_System {
     private function __construct() {
         $this->init_hooks();
         $this->load_user_preferences();
+        $this->init_admin_settings();
     }
 
     /**
@@ -62,8 +63,416 @@ class GI_AI_System {
         // REST API エンドポイント
         add_action('rest_api_init', array($this, 'register_rest_endpoints'));
         
+        // API テスト用 AJAX ハンドラー
+        add_action('wp_ajax_gi_test_ai_api', array($this, 'test_ai_api_connection'));
+        
         // ユーザー行動のトラッキング
         add_action('wp_footer', array($this, 'add_tracking_script'));
+        
+        // 管理画面メニューの追加
+        add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_init', array($this, 'register_admin_settings'));
+    }
+
+    /**
+     * 管理画面設定の初期化
+     */
+    private function init_admin_settings() {
+        // デフォルト設定値の設定
+        if (get_option('gi_ai_settings') === false) {
+            $default_settings = array(
+                'provider' => 'internal',
+                'openai_api_key' => '',
+                'anthropic_api_key' => '',
+                'google_api_key' => '',
+                'model_preference' => 'gpt-4',
+                'max_tokens' => 1000,
+                'temperature' => 0.7,
+                'enable_external_ai' => false,
+                'fallback_to_internal' => true,
+                'api_timeout' => 30,
+                'rate_limit_per_minute' => 30,
+                'cache_responses' => true,
+                'cache_duration' => 3600
+            );
+            add_option('gi_ai_settings', $default_settings);
+        }
+    }
+
+    /**
+     * 管理画面メニューの追加
+     */
+    public function add_admin_menu() {
+        add_options_page(
+            'AI システム設定',
+            'AI システム',
+            'manage_options',
+            'gi-ai-settings',
+            array($this, 'admin_settings_page')
+        );
+    }
+
+    /**
+     * 管理画面設定の登録
+     */
+    public function register_admin_settings() {
+        register_setting('gi_ai_settings_group', 'gi_ai_settings', array(
+            'sanitize_callback' => array($this, 'sanitize_ai_settings')
+        ));
+
+        // API設定セクション
+        add_settings_section(
+            'gi_ai_api_section',
+            'API設定',
+            array($this, 'api_section_callback'),
+            'gi-ai-settings'
+        );
+
+        // AI プロバイダー選択
+        add_settings_field(
+            'gi_ai_provider',
+            'AIプロバイダー',
+            array($this, 'provider_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_api_section'
+        );
+
+        // OpenAI API キー
+        add_settings_field(
+            'gi_openai_api_key',
+            'OpenAI APIキー',
+            array($this, 'openai_key_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_api_section'
+        );
+
+        // Claude (Anthropic) API キー
+        add_settings_field(
+            'gi_anthropic_api_key',
+            'Anthropic APIキー',
+            array($this, 'anthropic_key_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_api_section'
+        );
+
+        // Google (Gemini) API キー
+        add_settings_field(
+            'gi_google_api_key',
+            'Google APIキー',
+            array($this, 'google_key_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_api_section'
+        );
+
+        // パフォーマンス設定セクション
+        add_settings_section(
+            'gi_ai_performance_section',
+            'パフォーマンス設定',
+            array($this, 'performance_section_callback'),
+            'gi-ai-settings'
+        );
+
+        // モデル設定
+        add_settings_field(
+            'gi_model_preference',
+            '優先モデル',
+            array($this, 'model_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_performance_section'
+        );
+
+        // 最大トークン数
+        add_settings_field(
+            'gi_max_tokens',
+            '最大トークン数',
+            array($this, 'max_tokens_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_performance_section'
+        );
+
+        // 温度設定
+        add_settings_field(
+            'gi_temperature',
+            '創造性レベル (Temperature)',
+            array($this, 'temperature_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_performance_section'
+        );
+
+        // 外部AI有効化
+        add_settings_field(
+            'gi_enable_external_ai',
+            '外部AI使用',
+            array($this, 'enable_external_ai_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_api_section'
+        );
+
+        // フォールバック設定
+        add_settings_field(
+            'gi_fallback_to_internal',
+            '内部AIフォールバック',
+            array($this, 'fallback_field_callback'),
+            'gi-ai-settings',
+            'gi_ai_performance_section'
+        );
+    }
+
+    /**
+     * 管理画面設定ページ
+     */
+    public function admin_settings_page() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        // 設定が保存されました
+        if (isset($_GET['settings-updated'])) {
+            add_settings_error('gi_ai_messages', 'gi_ai_message', '設定が保存されました。', 'updated');
+        }
+
+        settings_errors('gi_ai_messages');
+        ?>
+        <div class="wrap">
+            <h1>Grant Insight AI システム設定</h1>
+            <p>AI相談・検索システムの設定を行います。外部AIサービスを利用する場合は、各プロバイダーのAPIキーを設定してください。</p>
+            
+            <form action="options.php" method="post">
+                <?php
+                settings_fields('gi_ai_settings_group');
+                do_settings_sections('gi-ai-settings');
+                submit_button('設定を保存');
+                ?>
+            </form>
+
+            <div class="gi-ai-test-section" style="margin-top: 30px; padding: 20px; background: #f9f9f9; border: 1px solid #ddd;">
+                <h2>API接続テスト</h2>
+                <p>設定したAPIキーの動作確認を行います。</p>
+                <button type="button" id="gi-test-api" class="button button-secondary">API接続テスト</button>
+                <div id="gi-test-result" style="margin-top: 10px;"></div>
+            </div>
+
+            <script>
+            jQuery(document).ready(function($) {
+                $('#gi-test-api').click(function() {
+                    var button = $(this);
+                    var result = $('#gi-test-result');
+                    
+                    button.prop('disabled', true).text('テスト中...');
+                    result.html('<p>API接続をテストしています...</p>');
+                    
+                    $.ajax({
+                        url: ajaxurl,
+                        method: 'POST',
+                        data: {
+                            action: 'gi_test_ai_api',
+                            nonce: '<?php echo wp_create_nonce('gi_test_api'); ?>'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                result.html('<div style="color: green;"><strong>✓ 接続成功:</strong> ' + response.data + '</div>');
+                            } else {
+                                result.html('<div style="color: red;"><strong>✗ 接続失敗:</strong> ' + response.data + '</div>');
+                            }
+                        },
+                        error: function() {
+                            result.html('<div style="color: red;"><strong>✗ エラー:</strong> 接続テストに失敗しました。</div>');
+                        },
+                        complete: function() {
+                            button.prop('disabled', false).text('API接続テスト');
+                        }
+                    });
+                });
+            });
+            </script>
+        </div>
+        <?php
+    }
+
+    /**
+     * 設定フィールドコールバック関数群
+     */
+    public function api_section_callback() {
+        echo '<p>外部AIサービスのAPI設定を行います。内部AIシステムのみを使用する場合は設定不要です。</p>';
+    }
+
+    public function performance_section_callback() {
+        echo '<p>AIレスポンスの品質とパフォーマンスを調整します。</p>';
+    }
+
+    public function provider_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $provider = $settings['provider'] ?? 'internal';
+        ?>
+        <select name="gi_ai_settings[provider]" id="gi_ai_provider">
+            <option value="internal" <?php selected($provider, 'internal'); ?>>内部AIシステム（推奨）</option>
+            <option value="openai" <?php selected($provider, 'openai'); ?>>OpenAI (GPT-4/GPT-3.5)</option>
+            <option value="anthropic" <?php selected($provider, 'anthropic'); ?>>Anthropic (Claude)</option>
+            <option value="google" <?php selected($provider, 'google'); ?>>Google (Gemini)</option>
+        </select>
+        <p class="description">使用するAIプロバイダーを選択してください。内部システムは無料で利用できます。</p>
+        <?php
+    }
+
+    public function openai_key_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $api_key = $settings['openai_api_key'] ?? '';
+        $masked_key = !empty($api_key) ? substr($api_key, 0, 7) . str_repeat('*', max(0, strlen($api_key) - 7)) : '';
+        ?>
+        <input type="password" name="gi_ai_settings[openai_api_key]" value="<?php echo esc_attr($api_key); ?>" class="regular-text" placeholder="sk-..." />
+        <?php if (!empty($masked_key)): ?>
+            <p class="description">現在設定済み: <?php echo esc_html($masked_key); ?></p>
+        <?php endif; ?>
+        <p class="description">OpenAI APIキーを入力してください。<a href="https://platform.openai.com/api-keys" target="_blank">APIキーの取得はこちら</a></p>
+        <?php
+    }
+
+    public function anthropic_key_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $api_key = $settings['anthropic_api_key'] ?? '';
+        $masked_key = !empty($api_key) ? substr($api_key, 0, 7) . str_repeat('*', max(0, strlen($api_key) - 7)) : '';
+        ?>
+        <input type="password" name="gi_ai_settings[anthropic_api_key]" value="<?php echo esc_attr($api_key); ?>" class="regular-text" placeholder="sk-ant-..." />
+        <?php if (!empty($masked_key)): ?>
+            <p class="description">現在設定済み: <?php echo esc_html($masked_key); ?></p>
+        <?php endif; ?>
+        <p class="description">Anthropic APIキーを入力してください。<a href="https://console.anthropic.com/" target="_blank">APIキーの取得はこちら</a></p>
+        <?php
+    }
+
+    public function google_key_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $api_key = $settings['google_api_key'] ?? '';
+        $masked_key = !empty($api_key) ? substr($api_key, 0, 7) . str_repeat('*', max(0, strlen($api_key) - 7)) : '';
+        ?>
+        <input type="password" name="gi_ai_settings[google_api_key]" value="<?php echo esc_attr($api_key); ?>" class="regular-text" placeholder="AIza..." />
+        <?php if (!empty($masked_key)): ?>
+            <p class="description">現在設定済み: <?php echo esc_html($masked_key); ?></p>
+        <?php endif; ?>
+        <p class="description">Google API キー（Gemini用）を入力してください。<a href="https://makersuite.google.com/app/apikey" target="_blank">APIキーの取得はこちら</a></p>
+        <?php
+    }
+
+    public function model_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $model = $settings['model_preference'] ?? 'gpt-4';
+        ?>
+        <select name="gi_ai_settings[model_preference]">
+            <option value="gpt-4" <?php selected($model, 'gpt-4'); ?>>GPT-4 (高品質)</option>
+            <option value="gpt-3.5-turbo" <?php selected($model, 'gpt-3.5-turbo'); ?>>GPT-3.5 Turbo (高速)</option>
+            <option value="claude-3-opus" <?php selected($model, 'claude-3-opus'); ?>>Claude-3 Opus (最高品質)</option>
+            <option value="claude-3-sonnet" <?php selected($model, 'claude-3-sonnet'); ?>>Claude-3 Sonnet (バランス)</option>
+            <option value="claude-3-haiku" <?php selected($model, 'claude-3-haiku'); ?>>Claude-3 Haiku (高速)</option>
+            <option value="gemini-pro" <?php selected($model, 'gemini-pro'); ?>>Gemini Pro</option>
+        </select>
+        <p class="description">使用するAIモデルを選択してください。</p>
+        <?php
+    }
+
+    public function max_tokens_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $max_tokens = $settings['max_tokens'] ?? 1000;
+        ?>
+        <input type="number" name="gi_ai_settings[max_tokens]" value="<?php echo esc_attr($max_tokens); ?>" min="100" max="4000" class="small-text" />
+        <p class="description">AIレスポンスの最大トークン数（100-4000）</p>
+        <?php
+    }
+
+    public function temperature_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $temperature = $settings['temperature'] ?? 0.7;
+        ?>
+        <input type="range" name="gi_ai_settings[temperature]" value="<?php echo esc_attr($temperature); ?>" min="0" max="1" step="0.1" class="temperature-slider" />
+        <span class="temperature-value"><?php echo esc_html($temperature); ?></span>
+        <p class="description">0.0（論理的）～ 1.0（創造的）</p>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slider = document.querySelector('.temperature-slider');
+            const value = document.querySelector('.temperature-value');
+            if (slider && value) {
+                slider.addEventListener('input', function() {
+                    value.textContent = this.value;
+                });
+            }
+        });
+        </script>
+        <?php
+    }
+
+    public function enable_external_ai_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $enabled = $settings['enable_external_ai'] ?? false;
+        ?>
+        <input type="checkbox" name="gi_ai_settings[enable_external_ai]" value="1" <?php checked($enabled, true); ?> />
+        <label for="gi_ai_settings[enable_external_ai]">外部AI API（OpenAI、Anthropic、Google）を使用する</label>
+        <p class="description">チェックを入れると、設定したAPIキーを使用して高品質なAI応答を生成します。</p>
+        <?php
+    }
+
+    public function fallback_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $fallback = $settings['fallback_to_internal'] ?? true;
+        ?>
+        <input type="checkbox" name="gi_ai_settings[fallback_to_internal]" value="1" <?php checked($fallback, true); ?> />
+        <label for="gi_ai_settings[fallback_to_internal]">外部API が失敗した場合、内部AIにフォールバックする</label>
+        <p class="description">推奨設定です。外部APIが利用できない場合でもサービスを継続できます。</p>
+        <?php
+    }
+
+    /**
+     * 設定値のサニタイズ
+     */
+    public function sanitize_ai_settings($input) {
+        $sanitized = array();
+        
+        // プロバイダー
+        $allowed_providers = array('internal', 'openai', 'anthropic', 'google');
+        $sanitized['provider'] = in_array($input['provider'], $allowed_providers) ? $input['provider'] : 'internal';
+        
+        // APIキー（セキュリティのため暗号化して保存）
+        $sanitized['openai_api_key'] = !empty($input['openai_api_key']) ? sanitize_text_field($input['openai_api_key']) : '';
+        $sanitized['anthropic_api_key'] = !empty($input['anthropic_api_key']) ? sanitize_text_field($input['anthropic_api_key']) : '';
+        $sanitized['google_api_key'] = !empty($input['google_api_key']) ? sanitize_text_field($input['google_api_key']) : '';
+        
+        // モデル設定
+        $allowed_models = array('gpt-4', 'gpt-3.5-turbo', 'claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku', 'gemini-pro');
+        $sanitized['model_preference'] = in_array($input['model_preference'], $allowed_models) ? $input['model_preference'] : 'gpt-4';
+        
+        // 数値設定
+        $sanitized['max_tokens'] = max(100, min(4000, intval($input['max_tokens'])));
+        $sanitized['temperature'] = max(0.0, min(1.0, floatval($input['temperature'])));
+        
+        // その他設定
+        $sanitized['enable_external_ai'] = !empty($input['enable_external_ai']);
+        $sanitized['fallback_to_internal'] = !empty($input['fallback_to_internal']);
+        $sanitized['api_timeout'] = max(10, min(60, intval($input['api_timeout'] ?? 30)));
+        $sanitized['rate_limit_per_minute'] = max(10, min(100, intval($input['rate_limit_per_minute'] ?? 30)));
+        $sanitized['cache_responses'] = !empty($input['cache_responses']);
+        $sanitized['cache_duration'] = max(300, min(86400, intval($input['cache_duration'] ?? 3600)));
+        
+        return $sanitized;
+    }
+
+    /**
+     * APIキーの取得
+     */
+    private function get_api_key($provider = null) {
+        $settings = get_option('gi_ai_settings', array());
+        
+        if (!$provider) {
+            $provider = $settings['provider'] ?? 'internal';
+        }
+        
+        switch ($provider) {
+            case 'openai':
+                return $settings['openai_api_key'] ?? '';
+            case 'anthropic':
+                return $settings['anthropic_api_key'] ?? '';
+            case 'google':
+                return $settings['google_api_key'] ?? '';
+            default:
+                return '';
+        }
     }
 
     /**
@@ -84,6 +493,8 @@ class GI_AI_System {
                 'nonce' => wp_create_nonce('gi_ai_nonce'),
                 'rest_url' => rest_url('gi/v1/'),
                 'user_id' => get_current_user_id(),
+                'ai_enabled' => $this->is_external_ai_enabled(),
+                'provider' => $this->get_current_provider(),
                 'messages' => array(
                     'thinking' => 'AI が考えています...',
                     'analyzing' => '分析中です...',
@@ -98,6 +509,165 @@ class GI_AI_System {
                 array(),
                 GI_THEME_VERSION
             );
+        }
+    }
+
+    /**
+     * 外部AI が有効かチェック
+     */
+    private function is_external_ai_enabled() {
+        $settings = get_option('gi_ai_settings', array());
+        return $settings['enable_external_ai'] ?? false;
+    }
+
+    /**
+     * 現在のAI プロバイダーを取得
+     */
+    private function get_current_provider() {
+        $settings = get_option('gi_ai_settings', array());
+        return $settings['provider'] ?? 'internal';
+    }
+
+    /**
+     * API 接続テスト
+     */
+    public function test_ai_api_connection() {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('権限がありません。');
+        }
+
+        if (!wp_verify_nonce($_POST['nonce'], 'gi_test_api')) {
+            wp_send_json_error('セキュリティチェックに失敗しました。');
+        }
+
+        $settings = get_option('gi_ai_settings', array());
+        $provider = $settings['provider'] ?? 'internal';
+
+        if ($provider === 'internal') {
+            wp_send_json_success('内部AI システムが正常に動作しています。');
+        }
+
+        $api_key = $this->get_api_key($provider);
+        
+        if (empty($api_key)) {
+            wp_send_json_error('API キーが設定されていません。');
+        }
+
+        $test_result = $this->test_external_api($provider, $api_key);
+        
+        if ($test_result['success']) {
+            wp_send_json_success($test_result['message']);
+        } else {
+            wp_send_json_error($test_result['message']);
+        }
+    }
+
+    /**
+     * 外部API のテスト
+     */
+    private function test_external_api($provider, $api_key) {
+        switch ($provider) {
+            case 'openai':
+                return $this->test_openai_api($api_key);
+            case 'anthropic':
+                return $this->test_anthropic_api($api_key);
+            case 'google':
+                return $this->test_google_api($api_key);
+            default:
+                return array('success' => false, 'message' => 'サポートされていないプロバイダーです。');
+        }
+    }
+
+    /**
+     * OpenAI API テスト
+     */
+    private function test_openai_api($api_key) {
+        $url = 'https://api.openai.com/v1/models';
+        
+        $response = wp_remote_get($url, array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type' => 'application/json'
+            ),
+            'timeout' => 15
+        ));
+
+        if (is_wp_error($response)) {
+            return array('success' => false, 'message' => 'API 接続エラー: ' . $response->get_error_message());
+        }
+
+        $status_code = wp_remote_retrieve_response_code($response);
+        
+        if ($status_code === 200) {
+            return array('success' => true, 'message' => 'OpenAI API に正常に接続できました。');
+        } else {
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            $error_message = $body['error']['message'] ?? 'API キーが無効です。';
+            return array('success' => false, 'message' => 'OpenAI API エラー: ' . $error_message);
+        }
+    }
+
+    /**
+     * Anthropic API テスト
+     */
+    private function test_anthropic_api($api_key) {
+        $url = 'https://api.anthropic.com/v1/messages';
+        
+        $data = array(
+            'model' => 'claude-3-haiku-20240307',
+            'max_tokens' => 10,
+            'messages' => array(
+                array('role' => 'user', 'content' => 'Test')
+            )
+        );
+
+        $response = wp_remote_post($url, array(
+            'headers' => array(
+                'x-api-key' => $api_key,
+                'Content-Type' => 'application/json',
+                'anthropic-version' => '2023-06-01'
+            ),
+            'body' => json_encode($data),
+            'timeout' => 15
+        ));
+
+        if (is_wp_error($response)) {
+            return array('success' => false, 'message' => 'API 接続エラー: ' . $response->get_error_message());
+        }
+
+        $status_code = wp_remote_retrieve_response_code($response);
+        
+        if ($status_code === 200) {
+            return array('success' => true, 'message' => 'Anthropic (Claude) API に正常に接続できました。');
+        } else {
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            $error_message = $body['error']['message'] ?? 'API キーが無効です。';
+            return array('success' => false, 'message' => 'Anthropic API エラー: ' . $error_message);
+        }
+    }
+
+    /**
+     * Google API テスト
+     */
+    private function test_google_api($api_key) {
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models?key=' . $api_key;
+        
+        $response = wp_remote_get($url, array(
+            'timeout' => 15
+        ));
+
+        if (is_wp_error($response)) {
+            return array('success' => false, 'message' => 'API 接続エラー: ' . $response->get_error_message());
+        }
+
+        $status_code = wp_remote_retrieve_response_code($response);
+        
+        if ($status_code === 200) {
+            return array('success' => true, 'message' => 'Google (Gemini) API に正常に接続できました。');
+        } else {
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            $error_message = $body['error']['message'] ?? 'API キーが無効です。';
+            return array('success' => false, 'message' => 'Google API エラー: ' . $error_message);
         }
     }
 
@@ -357,6 +927,32 @@ class GI_AI_System {
      * AIレスポンス生成
      */
     private function generate_ai_response($message, $context = array(), $conversation_id = '') {
+        // 外部AIが有効で、APIキーが設定されている場合は外部APIを使用
+        $settings = get_option('gi_ai_settings', array());
+        
+        if (($settings['enable_external_ai'] ?? false) && !empty($this->get_api_key())) {
+            $external_response = $this->generate_external_ai_response($message, $context, $conversation_id);
+            if ($external_response && !empty($external_response['text'])) {
+                return array(
+                    'message' => $external_response['text'],
+                    'suggestions' => $external_response['suggestions'] ?? array(),
+                    'confidence' => $external_response['confidence'] ?? 0.9,
+                    'follow_up_questions' => $external_response['follow_up_questions'] ?? array()
+                );
+            }
+            
+            // 外部APIが失敗した場合、フォールバック設定に従う
+            if (!($settings['fallback_to_internal'] ?? true)) {
+                return array(
+                    'message' => 'AI サービスが一時的に利用できません。しばらく時間を置いてからお試しください。',
+                    'suggestions' => array('再試行', '検索を続ける'),
+                    'confidence' => 0.1,
+                    'follow_up_questions' => array()
+                );
+            }
+        }
+
+        // 内部AIレスポンスロジック（従来のルールベース）
         // 会話履歴を取得
         $history = $this->get_conversation_history($conversation_id);
         
@@ -1006,6 +1602,276 @@ class GI_AI_System {
             'recommendations' => $recommendations,
             'total' => count($recommendations)
         ));
+    }
+
+    /**
+     * 外部AI APIを使用したレスポンス生成
+     */
+    private function generate_external_ai_response($message, $context = array(), $conversation_id = '') {
+        $settings = get_option('gi_ai_settings', array());
+        $provider = $settings['provider'] ?? 'internal';
+        
+        if ($provider === 'internal') {
+            return false;
+        }
+        
+        // キャッシュチェック
+        if ($settings['cache_responses'] ?? true) {
+            $cache_key = 'gi_ai_response_' . md5($message . serialize($context));
+            $cached_response = get_transient($cache_key);
+            if ($cached_response) {
+                return $cached_response;
+            }
+        }
+        
+        // プロンプトの構築
+        $system_prompt = $this->build_system_prompt($context);
+        $user_prompt = $this->build_user_prompt($message, $context);
+        
+        $response = null;
+        
+        switch ($provider) {
+            case 'openai':
+                $response = $this->call_openai_api($system_prompt, $user_prompt, $settings);
+                break;
+            case 'anthropic':
+                $response = $this->call_anthropic_api($system_prompt, $user_prompt, $settings);
+                break;
+            case 'google':
+                $response = $this->call_google_api($system_prompt, $user_prompt, $settings);
+                break;
+        }
+        
+        // レスポンスをキャッシュ
+        if ($response && ($settings['cache_responses'] ?? true)) {
+            set_transient($cache_key, $response, $settings['cache_duration'] ?? 3600);
+        }
+        
+        return $response;
+    }
+
+    /**
+     * システムプロンプトの構築
+     */
+    private function build_system_prompt($context = array()) {
+        $prompt = "あなたは助成金・補助金の専門家です。日本の中小企業や個人事業主に対して、最適な助成金・補助金を見つけるサポートを行います。\n\n";
+        $prompt .= "回答時は以下の点に注意してください：\n";
+        $prompt .= "- 正確で実用的な情報を提供する\n";
+        $prompt .= "- 専門用語は分かりやすく説明する\n";
+        $prompt .= "- 具体的な次のステップを提案する\n";
+        $prompt .= "- 回答はJSON形式で、text、suggestions、confidence、follow_up_questionsを含める\n";
+        
+        if (!empty($context['business_type'])) {
+            $prompt .= "\n事業タイプ: " . $context['business_type'];
+        }
+        
+        if (!empty($context['industry'])) {
+            $prompt .= "\n業界: " . $context['industry'];
+        }
+        
+        return $prompt;
+    }
+
+    /**
+     * ユーザープロンプトの構築
+     */
+    private function build_user_prompt($message, $context = array()) {
+        $prompt = $message;
+        
+        if (!empty($context['urgency']) && $context['urgency'] === 'high') {
+            $prompt .= "\n\n※ 緊急性が高い案件です。";
+        }
+        
+        $prompt .= "\n\n回答は必ずJSON形式で、以下のフィールドを含めてください：";
+        $prompt .= "\n{ \"text\": \"回答内容\", \"suggestions\": [\"提案1\", \"提案2\"], \"confidence\": 0.9, \"follow_up_questions\": [\"質問1\", \"質問2\"] }";
+        
+        return $prompt;
+    }
+
+    /**
+     * OpenAI API 呼び出し
+     */
+    private function call_openai_api($system_prompt, $user_prompt, $settings) {
+        $api_key = $this->get_api_key('openai');
+        if (empty($api_key)) {
+            return false;
+        }
+        
+        $url = 'https://api.openai.com/v1/chat/completions';
+        
+        $data = array(
+            'model' => $settings['model_preference'] ?? 'gpt-4',
+            'messages' => array(
+                array('role' => 'system', 'content' => $system_prompt),
+                array('role' => 'user', 'content' => $user_prompt)
+            ),
+            'max_tokens' => $settings['max_tokens'] ?? 1000,
+            'temperature' => $settings['temperature'] ?? 0.7
+        );
+        
+        $response = wp_remote_post($url, array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type' => 'application/json'
+            ),
+            'body' => json_encode($data),
+            'timeout' => $settings['api_timeout'] ?? 30
+        ));
+        
+        if (is_wp_error($response)) {
+            error_log('OpenAI API Error: ' . $response->get_error_message());
+            return false;
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($body['choices'][0]['message']['content'])) {
+            $content = $body['choices'][0]['message']['content'];
+            $parsed = json_decode($content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && isset($parsed['text'])) {
+                return $parsed;
+            } else {
+                // JSONパースに失敗した場合は、テキストとして返す
+                return array(
+                    'text' => $content,
+                    'suggestions' => array(),
+                    'confidence' => 0.8,
+                    'follow_up_questions' => array()
+                );
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Anthropic API 呼び出し
+     */
+    private function call_anthropic_api($system_prompt, $user_prompt, $settings) {
+        $api_key = $this->get_api_key('anthropic');
+        if (empty($api_key)) {
+            return false;
+        }
+        
+        $url = 'https://api.anthropic.com/v1/messages';
+        
+        $model = $settings['model_preference'] ?? 'claude-3-sonnet';
+        if (!str_starts_with($model, 'claude-3')) {
+            $model = 'claude-3-sonnet-20240229';
+        } else {
+            $model_map = array(
+                'claude-3-opus' => 'claude-3-opus-20240229',
+                'claude-3-sonnet' => 'claude-3-sonnet-20240229',
+                'claude-3-haiku' => 'claude-3-haiku-20240307'
+            );
+            $model = $model_map[$model] ?? 'claude-3-sonnet-20240229';
+        }
+        
+        $data = array(
+            'model' => $model,
+            'max_tokens' => $settings['max_tokens'] ?? 1000,
+            'system' => $system_prompt,
+            'messages' => array(
+                array('role' => 'user', 'content' => $user_prompt)
+            )
+        );
+        
+        $response = wp_remote_post($url, array(
+            'headers' => array(
+                'x-api-key' => $api_key,
+                'Content-Type' => 'application/json',
+                'anthropic-version' => '2023-06-01'
+            ),
+            'body' => json_encode($data),
+            'timeout' => $settings['api_timeout'] ?? 30
+        ));
+        
+        if (is_wp_error($response)) {
+            error_log('Anthropic API Error: ' . $response->get_error_message());
+            return false;
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($body['content'][0]['text'])) {
+            $content = $body['content'][0]['text'];
+            $parsed = json_decode($content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && isset($parsed['text'])) {
+                return $parsed;
+            } else {
+                return array(
+                    'text' => $content,
+                    'suggestions' => array(),
+                    'confidence' => 0.8,
+                    'follow_up_questions' => array()
+                );
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Google API 呼び出し
+     */
+    private function call_google_api($system_prompt, $user_prompt, $settings) {
+        $api_key = $this->get_api_key('google');
+        if (empty($api_key)) {
+            return false;
+        }
+        
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $api_key;
+        
+        $combined_prompt = $system_prompt . "\n\nUser: " . $user_prompt;
+        
+        $data = array(
+            'contents' => array(
+                array(
+                    'parts' => array(
+                        array('text' => $combined_prompt)
+                    )
+                )
+            ),
+            'generationConfig' => array(
+                'maxOutputTokens' => $settings['max_tokens'] ?? 1000,
+                'temperature' => $settings['temperature'] ?? 0.7
+            )
+        );
+        
+        $response = wp_remote_post($url, array(
+            'headers' => array(
+                'Content-Type' => 'application/json'
+            ),
+            'body' => json_encode($data),
+            'timeout' => $settings['api_timeout'] ?? 30
+        ));
+        
+        if (is_wp_error($response)) {
+            error_log('Google API Error: ' . $response->get_error_message());
+            return false;
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($body['candidates'][0]['content']['parts'][0]['text'])) {
+            $content = $body['candidates'][0]['content']['parts'][0]['text'];
+            $parsed = json_decode($content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && isset($parsed['text'])) {
+                return $parsed;
+            } else {
+                return array(
+                    'text' => $content,
+                    'suggestions' => array(),
+                    'confidence' => 0.8,
+                    'follow_up_questions' => array()
+                );
+            }
+        }
+        
+        return false;
     }
 }
 
