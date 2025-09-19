@@ -2233,6 +2233,76 @@ class GI_Learning_Engine {
             'response_quality' => 0.8
         );
     }
+    
+    /**
+     * 基本的なセマンティック分析（フォールバック用）
+     */
+    private function basic_semantic_analysis($message) {
+        $keywords = array();
+        $confidence = 0.3;
+        
+        // 簡単なキーワード抽出
+        $common_words = array('補助金', '助成金', 'IT', '製造業', '創業', '起業', '設備', '研究', '開発');
+        foreach ($common_words as $word) {
+            if (strpos($message, $word) !== false) {
+                $keywords[] = $word;
+                $confidence += 0.1;
+            }
+        }
+        
+        return array(
+            'keywords' => $keywords,
+            'confidence' => min($confidence, 0.9)
+        );
+    }
+    
+    /**
+     * 基本的なインテント分析（フォールバック用）
+     */
+    private function basic_intent_analysis($message) {
+        $intents = array(
+            'search' => array('探す', '検索', '見つけ', '調べ'),
+            'consultation' => array('相談', 'アドバイス', '教え', 'サポート'),
+            'information' => array('情報', '詳細', '内容', '条件')
+        );
+        
+        foreach ($intents as $intent => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (strpos($message, $keyword) !== false) {
+                    return array('intent' => $intent, 'confidence' => 0.6);
+                }
+            }
+        }
+        
+        return array('intent' => 'general_inquiry', 'confidence' => 0.4);
+    }
+    
+    /**
+     * 基本的な感情分析（フォールバック用）
+     */
+    private function basic_sentiment_analysis($message) {
+        $positive_words = array('良い', 'ありがとう', '助かる', '素晴らしい', '最高');
+        $negative_words = array('困っ', '大変', '問題', 'だめ', '悪い');
+        
+        $positive_count = 0;
+        $negative_count = 0;
+        
+        foreach ($positive_words as $word) {
+            if (strpos($message, $word) !== false) $positive_count++;
+        }
+        
+        foreach ($negative_words as $word) {
+            if (strpos($message, $word) !== false) $negative_count++;
+        }
+        
+        if ($positive_count > $negative_count) {
+            return array('polarity' => 'positive', 'confidence' => 0.6);
+        } elseif ($negative_count > $positive_count) {
+            return array('polarity' => 'negative', 'confidence' => 0.6);
+        }
+        
+        return array('polarity' => 'neutral', 'confidence' => 0.5);
+    }
 }
 
 // Helper functions for statistics
@@ -2314,80 +2384,7 @@ function gi_check_database_performance() { return 0.92; }
 function gi_check_cache_efficiency() { return 0.88; }
 function gi_calculate_error_rate() { return 0.97; } // 1 - error_rate
 
-/**
- * AI System initialization function
- * Called by template files to initialize AI functionality
- */
-    /**
-     * 基本的なセマンティック分析（フォールバック用）
-     */
-    private function basic_semantic_analysis($message) {
-        $keywords = array();
-        $confidence = 0.3;
-        
-        // 簡単なキーワード抽出
-        $common_words = array('補助金', '助成金', 'IT', '製造業', '創業', '起業', '設備', '研究', '開発');
-        foreach ($common_words as $word) {
-            if (strpos($message, $word) !== false) {
-                $keywords[] = $word;
-                $confidence += 0.1;
-            }
-        }
-        
-        return array(
-            'keywords' => $keywords,
-            'confidence' => min($confidence, 0.9)
-        );
-    }
-    
-    /**
-     * 基本的なインテント分析（フォールバック用）
-     */
-    private function basic_intent_analysis($message) {
-        $intents = array(
-            'search' => array('探す', '検索', '見つけ', '調べ'),
-            'consultation' => array('相談', 'アドバイス', '教え', 'サポート'),
-            'information' => array('情報', '詳細', '内容', '条件')
-        );
-        
-        foreach ($intents as $intent => $keywords) {
-            foreach ($keywords as $keyword) {
-                if (strpos($message, $keyword) !== false) {
-                    return array('intent' => $intent, 'confidence' => 0.6);
-                }
-            }
-        }
-        
-        return array('intent' => 'general_inquiry', 'confidence' => 0.4);
-    }
-    
-    /**
-     * 基本的な感情分析（フォールバック用）
-     */
-    private function basic_sentiment_analysis($message) {
-        $positive_words = array('良い', 'ありがとう', '助かる', '素晴らしい', '最高');
-        $negative_words = array('困っ', '大変', '問題', 'だめ', '悪い');
-        
-        $positive_count = 0;
-        $negative_count = 0;
-        
-        foreach ($positive_words as $word) {
-            if (strpos($message, $word) !== false) $positive_count++;
-        }
-        
-        foreach ($negative_words as $word) {
-            if (strpos($message, $word) !== false) $negative_count++;
-        }
-        
-        if ($positive_count > $negative_count) {
-            return array('polarity' => 'positive', 'confidence' => 0.6);
-        } elseif ($negative_count > $positive_count) {
-            return array('polarity' => 'negative', 'confidence' => 0.6);
-        }
-        
-        return array('polarity' => 'neutral', 'confidence' => 0.5);
-    }
-}
+
 
 /**
  * AI System initialization function
