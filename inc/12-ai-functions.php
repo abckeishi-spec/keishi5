@@ -403,6 +403,30 @@ class GI_AI_System {
         $settings = get_option('gi_ai_settings', array());
         $enabled = $settings['enable_external_ai'] ?? false;
         ?>
+        <label>
+            <input type="checkbox" name="gi_ai_settings[enable_external_ai]" value="1" <?php checked($enabled, true); ?> />
+            外部AI APIを使用する
+        </label>
+        <p class="description">チェックすると選択したAIプロバイダーのAPIを使用します。APIキーの設定が必要です。</p>
+        <?php
+    }
+
+    public function fallback_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $fallback = $settings['fallback_to_internal'] ?? true;
+        ?>
+        <label>
+            <input type="checkbox" name="gi_ai_settings[fallback_to_internal]" value="1" <?php checked($fallback, true); ?> />
+            外部API失敗時に内部AIにフォールバック
+        </label>
+        <p class="description">外部APIが利用できない場合、自動的に内部AIシステムを使用します。</p>
+        <?php
+    }
+
+    public function enable_external_ai_field_callback() {
+        $settings = get_option('gi_ai_settings', array());
+        $enabled = $settings['enable_external_ai'] ?? false;
+        ?>
         <input type="checkbox" name="gi_ai_settings[enable_external_ai]" value="1" <?php checked($enabled, true); ?> />
         <label for="gi_ai_settings[enable_external_ai]">外部AI API（OpenAI、Anthropic、Google）を使用する</label>
         <p class="description">チェックを入れると、設定したAPIキーを使用して高品質なAI応答を生成します。</p>
@@ -1867,6 +1891,296 @@ class GI_AI_System {
                     'suggestions' => array(),
                     'confidence' => 0.8,
                     'follow_up_questions' => array()
+                );
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * 外部AI APIを使用したレスポンス生成
+     */
+    private function generate_external_ai_response($message, $context = array(), $conversation_id = '') {
+        $settings = get_option('gi_ai_settings', array());
+        $provider = $settings['provider'] ?? 'internal';
+        
+        if ($provider === 'internal') {
+            return false;
+        }
+        
+        // キャッシュチェック
+        if ($settings['cache_responses'] ?? true) {
+            $cache_key = 'gi_ai_response_' . md5($message . serialize($context));
+            $cached_response = get_transient($cache_key);
+            if ($cached_response) {
+                return $cached_response;
+            }
+        }
+        
+        // プロンプトの構築
+        $system_prompt = $this->build_system_prompt($context);
+        $user_prompt = $this->build_user_prompt($message, $context);
+        
+        $response = null;
+        
+        switch ($provider) {
+            case 'openai':
+                $response = $this->call_openai_api($system_prompt, $user_prompt, $settings);
+                break;
+            case 'anthropic':
+                $response = $this->call_anthropic_api($system_prompt, $user_prompt, $settings);
+                break;
+            case 'google':
+                $response = $this->call_google_api($system_prompt, $user_prompt, $settings);
+                break;
+        }
+        
+        // レスポンスをキャッシュ
+        if ($response && ($settings['cache_responses'] ?? true)) {
+            set_transient($cache_key, $response, $settings['cache_duration'] ?? 3600);
+        }
+        
+        return $response;
+    }
+
+    /**
+     * システムプロンプトの構築
+     */
+    private function build_system_prompt($context = array()) {
+        $prompt = "あなたは助成金・補助金の専門家です。日本の中小企業や個人事業主に対して、最適な助成金・補助金を見つけるサポートを行います。\n\n";
+        $prompt .= "回答時は以下の点に注意してください：\n";
+        $prompt .= "- 正確で実用的な情報を提供する\n";
+        $prompt .= "- 専門用語は分かりやすく説明する\n";
+        $prompt .= "- 具体的な次のステップを提案する\n";
+        $prompt .= "- 回答はJSON形式で、text、suggestions、confidence、follow_up_questionsを含める\n";
+        
+        if (!empty($context['business_type'])) {
+            $prompt .= "\n事業タイプ: " . $context['business_type'];
+        }
+        
+        if (!empty($context['industry'])) {
+            $prompt .= "\n業界: " . $context['industry'];
+        }
+        
+        return $prompt;
+    }
+
+    /**
+     * ユーザープロンプトの構築
+     */
+    private function build_user_prompt($message, $context = array()) {
+        $prompt = $message;
+        
+        if (!empty($context['urgency']) && $context['urgency'] === 'high') {
+            $prompt .= "\n\n※ 緊急性が高い案件です。";
+        }
+        
+        $prompt .= "\n\n回答は必ずJSON形式で、以下のフィールドを含めてください：";
+        $prompt .= "\n{ \"text\": \"回答内容\", \"suggestions\": [\"提案1\", \"提案2\"], \"confidence\": 0.9, \"follow_up_questions\": [\"質問1\", \"質問2\"] }";
+        
+        return $prompt;
+    }
+
+    /**
+     * OpenAI API 呼び出し
+     */
+    private function call_openai_api($system_prompt, $user_prompt, $settings) {
+        $api_key = $this->get_api_key('openai');
+        if (empty($api_key)) {
+            return false;
+        }
+        
+        $url = 'https://api.openai.com/v1/chat/completions';
+        
+        $model = $settings['model_preference'] ?? 'gpt-4';
+        if (!in_array($model, ['gpt-4', 'gpt-3.5-turbo', 'gpt-4-turbo-preview'])) {
+            $model = 'gpt-4';
+        }
+        
+        $data = array(
+            'model' => $model,
+            'messages' => array(
+                array('role' => 'system', 'content' => $system_prompt),
+                array('role' => 'user', 'content' => $user_prompt)
+            ),
+            'max_tokens' => $settings['max_tokens'] ?? 1000,
+            'temperature' => $settings['temperature'] ?? 0.7
+        );
+        
+        $response = wp_remote_post($url, array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type' => 'application/json'
+            ),
+            'body' => json_encode($data),
+            'timeout' => $settings['api_timeout'] ?? 30
+        ));
+        
+        if (is_wp_error($response)) {
+            error_log('OpenAI API Error: ' . $response->get_error_message());
+            return false;
+        }
+        
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code !== 200) {
+            error_log('OpenAI API HTTP Error: ' . $status_code);
+            return false;
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($body['choices'][0]['message']['content'])) {
+            $content = $body['choices'][0]['message']['content'];
+            $parsed = json_decode($content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && isset($parsed['text'])) {
+                return $parsed;
+            } else {
+                // JSONパースに失敗した場合は、テキストとして返す
+                return array(
+                    'text' => $content,
+                    'suggestions' => array('詳しく教えて', '他の選択肢は？'),
+                    'confidence' => 0.8,
+                    'follow_up_questions' => array('他にご質問はありますか？')
+                );
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Anthropic API 呼び出し
+     */
+    private function call_anthropic_api($system_prompt, $user_prompt, $settings) {
+        $api_key = $this->get_api_key('anthropic');
+        if (empty($api_key)) {
+            return false;
+        }
+        
+        $url = 'https://api.anthropic.com/v1/messages';
+        
+        $model = $settings['model_preference'] ?? 'claude-3-sonnet';
+        $model_map = array(
+            'claude-3-opus' => 'claude-3-opus-20240229',
+            'claude-3-sonnet' => 'claude-3-sonnet-20240229',
+            'claude-3-haiku' => 'claude-3-haiku-20240307'
+        );
+        
+        $model = $model_map[$model] ?? 'claude-3-sonnet-20240229';
+        
+        $data = array(
+            'model' => $model,
+            'max_tokens' => $settings['max_tokens'] ?? 1000,
+            'system' => $system_prompt,
+            'messages' => array(
+                array('role' => 'user', 'content' => $user_prompt)
+            )
+        );
+        
+        $response = wp_remote_post($url, array(
+            'headers' => array(
+                'x-api-key' => $api_key,
+                'Content-Type' => 'application/json',
+                'anthropic-version' => '2023-06-01'
+            ),
+            'body' => json_encode($data),
+            'timeout' => $settings['api_timeout'] ?? 30
+        ));
+        
+        if (is_wp_error($response)) {
+            error_log('Anthropic API Error: ' . $response->get_error_message());
+            return false;
+        }
+        
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code !== 200) {
+            error_log('Anthropic API HTTP Error: ' . $status_code);
+            return false;
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($body['content'][0]['text'])) {
+            $content = $body['content'][0]['text'];
+            $parsed = json_decode($content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && isset($parsed['text'])) {
+                return $parsed;
+            } else {
+                return array(
+                    'text' => $content,
+                    'suggestions' => array('詳しく教えて', '他の選択肢は？'),
+                    'confidence' => 0.8,
+                    'follow_up_questions' => array('他にご質問はありますか？')
+                );
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Google API 呼び出し
+     */
+    private function call_google_api($system_prompt, $user_prompt, $settings) {
+        $api_key = $this->get_api_key('google');
+        if (empty($api_key)) {
+            return false;
+        }
+        
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' . $api_key;
+        
+        $combined_prompt = $system_prompt . "\n\nUser: " . $user_prompt;
+        
+        $data = array(
+            'contents' => array(
+                array(
+                    'parts' => array(
+                        array('text' => $combined_prompt)
+                    )
+                )
+            ),
+            'generationConfig' => array(
+                'maxOutputTokens' => $settings['max_tokens'] ?? 1000,
+                'temperature' => $settings['temperature'] ?? 0.7
+            )
+        );
+        
+        $response = wp_remote_post($url, array(
+            'headers' => array(
+                'Content-Type' => 'application/json'
+            ),
+            'body' => json_encode($data),
+            'timeout' => $settings['api_timeout'] ?? 30
+        ));
+        
+        if (is_wp_error($response)) {
+            error_log('Google API Error: ' . $response->get_error_message());
+            return false;
+        }
+        
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code !== 200) {
+            error_log('Google API HTTP Error: ' . $status_code);
+            return false;
+        }
+        
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        
+        if (isset($body['candidates'][0]['content']['parts'][0]['text'])) {
+            $content = $body['candidates'][0]['content']['parts'][0]['text'];
+            $parsed = json_decode($content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && isset($parsed['text'])) {
+                return $parsed;
+            } else {
+                return array(
+                    'text' => $content,
+                    'suggestions' => array('詳しく教えて', '他の選択肢は？'),
+                    'confidence' => 0.8,
+                    'follow_up_questions' => array('他にご質問はありますか？')
                 );
             }
         }
